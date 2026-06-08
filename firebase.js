@@ -9,12 +9,13 @@
 // CONFIGURACIÓN DE FIREBASE
 // ============================================
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "tu-proyecto.firebaseapp.com",
-  projectId: "tu-proyecto",
-  storageBucket: "tu-proyecto.appspot.com",
-  messagingSenderId: "TU_SENDER_ID",
-  appId: "TU_APP_ID"
+  apiKey: "AIzaSYCYLPL86XC9LJGNMuq051UejPhHPWKPTTW",
+  authDomain: "lovespace-e93ab.firebaseapp.com",
+  projectId: "lovespace-e93ab",
+  storageBucket: "lovespace-e93ab.appspot.com",
+  messagingSenderId: "445649925991",
+  appId: "1:445649925991:web:781b4c4b6fd2bee048ffc2",
+  measurementId: "G-E8XCC7PSCQ"
 };
 
 // ============================================
