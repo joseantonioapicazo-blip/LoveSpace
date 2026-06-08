@@ -9,18 +9,18 @@
 // CONFIGURACIÓN DE FIREBASE
 // ============================================
 const firebaseConfig = {
-  apiKey: "AIzaSYCYLPL86XC9LJGNMuq051UejPhHPWKPTTW",
+  apiKey: "AIzaSyCYLpL86Xc9LJGNMuqo5IUejphHpWKpTTw",
   authDomain: "lovespace-e93ab.firebaseapp.com",
   projectId: "lovespace-e93ab",
-  storageBucket: "lovespace-e93ab.appspot.com",
-  messagingSenderId: "445649925991",
-  appId: "1:445649925991:web:781b4c4b6fd2bee048ffc2",
+  storageBucket: "lovespace-e93ab.firebasestorage.app",
+  messagingSenderId: "445049925991",
+  appId: "1:445049925991:web:781b4c4b6fd2b0e048ffc2",
   measurementId: "G-E8XCC7PSCQ"
 };
 
-// =============================================
+// ============================================
 // INICIALIZACIÓN DE FIREBASE
-// =============================================
+// ============================================
 let auth, db, storage;
 
 // Inicializar Firebase cuando el script cargue
