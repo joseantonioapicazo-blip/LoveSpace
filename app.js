@@ -159,7 +159,19 @@ async function loadUserData(uid) {
     const userDoc = await db.collection('users').doc(uid).get();
     
     if (userDoc.exists) {
-      AppState.userData = userDoc.data();
+      const userData = userDoc.data();
+      
+      // Verificar si el usuario tiene código, si no, generar uno
+      if (!userData.codigo) {
+        const coupleCode = generateCoupleCode();
+        await db.collection('users').doc(uid).update({
+          codigo: coupleCode
+        });
+        userData.codigo = coupleCode;
+        console.log('✓ Código de pareja generado:', coupleCode);
+      }
+      
+      AppState.userData = userData;
       console.log('✓ Datos del usuario cargados');
     }
   } catch (error) {
