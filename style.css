@@ -251,6 +251,11 @@ body {
   margin-bottom: var(--spacing-md);
 }
 
+.pairing-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
 .pairing-divider {
   display: flex;
   align-items: center;
