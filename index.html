@@ -72,13 +72,23 @@
       <div class="pairing-code-card">
         <p class="pairing-label">Tu código de pareja</p>
         <div class="pairing-code" id="myCoupleCode">--------</div>
-        <button id="copyCodeBtn" class="btn btn-secondary btn-small">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-          </svg>
-          Copiar
-        </button>
+        <div class="pairing-buttons">
+          <button id="copyCodeBtn" class="btn btn-secondary btn-small">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copiar
+          </button>
+          <button id="regenerateCodeBtn" class="btn btn-secondary btn-small">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 4v6h-6"/>
+              <path d="M1 20v-6h6"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+            Regenerar
+          </button>
+        </div>
       </div>
       
       <div class="pairing-divider">
