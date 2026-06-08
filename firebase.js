@@ -18,9 +18,9 @@ const firebaseConfig = {
   measurementId: "G-E8XCC7PSCQ"
 };
 
-// ============================================
+// =============================================
 // INICIALIZACIÓN DE FIREBASE
-// ============================================
+// =============================================
 let auth, db, storage;
 
 // Inicializar Firebase cuando el script cargue
