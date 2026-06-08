@@ -218,17 +218,55 @@ function showPairingScreen() {
   setupPairingListeners();
 }
 
+// Flag para evitar listeners duplicados
+let pairingListenersSetup = false;
+
 function setupPairingListeners() {
-  // Copiar código
-  document.getElementById('copyCodeBtn').addEventListener('click', () => {
+  // Evitar registrar listeners múltiples veces
+  if (pairingListenersSetup) {
+    console.log('Listeners de emparejamiento ya configurados');
+    return;
+  }
+  
+  // Verificar que los elementos existan
+  const copyCodeBtn = document.getElementById('copyCodeBtn');
+  const regenerateCodeBtn = document.getElementById('regenerateCodeBtn');
+  const sendRequestBtn = document.getElementById('sendRequestBtn');
+  const cancelRequestBtn = document.getElementById('cancelRequestBtn');
+  const acceptRequestBtn = document.getElementById('acceptRequestBtn');
+  const rejectRequestBtn = document.getElementById('rejectRequestBtn');
+  
+  if (!copyCodeBtn || !regenerateCodeBtn || !sendRequestBtn || !cancelRequestBtn || !acceptRequestBtn || !rejectRequestBtn) {
+    console.error('✗ Faltan elementos HTML para configurar listeners de emparejamiento');
+    return;
+  }
+  
+  // Copiar código con fallback
+  copyCodeBtn.addEventListener('click', () => {
+    if (!AppState.userData || !AppState.userData.codigo) {
+      showNotification('No hay código disponible', 'error');
+      return;
+    }
+    
     const code = AppState.userData.codigo;
-    navigator.clipboard.writeText(code).then(() => {
-      showNotification('Código copiado al portapapeles', 'success');
-    });
+    
+    // Intentar usar navigator.clipboard primero
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(() => {
+        showNotification('Código copiado al portapapeles', 'success');
+      }).catch((err) => {
+        console.error('Error con navigator.clipboard:', err);
+        // Fallback a método antiguo
+        fallbackCopyTextToClipboard(code);
+      });
+    } else {
+      // Fallback directo para navegadores antiguos
+      fallbackCopyTextToClipboard(code);
+    }
   });
   
   // Regenerar código
-  document.getElementById('regenerateCodeBtn').addEventListener('click', async () => {
+  regenerateCodeBtn.addEventListener('click', async () => {
     if (!confirm('¿Estás seguro de que quieres generar un nuevo código? Tu código actual dejará de ser válido.')) {
       return;
     }
@@ -242,7 +280,10 @@ function setupPairingListeners() {
       });
       
       AppState.userData.codigo = newCode;
-      document.getElementById('myCoupleCode').textContent = newCode;
+      const myCoupleCodeEl = document.getElementById('myCoupleCode');
+      if (myCoupleCodeEl) {
+        myCoupleCodeEl.textContent = newCode;
+      }
       
       showNotification('Nuevo código generado: ' + newCode, 'success');
     } catch (error) {
@@ -252,26 +293,71 @@ function setupPairingListeners() {
   });
   
   // Enviar solicitud
-  document.getElementById('sendRequestBtn').addEventListener('click', sendPairRequest);
+  sendRequestBtn.addEventListener('click', sendPairRequest);
   
   // Cancelar solicitud
-  document.getElementById('cancelRequestBtn').addEventListener('click', cancelPairRequest);
+  cancelRequestBtn.addEventListener('click', cancelPairRequest);
   
   // Aceptar solicitud
-  document.getElementById('acceptRequestBtn').addEventListener('click', acceptPairRequest);
+  acceptRequestBtn.addEventListener('click', acceptPairRequest);
   
   // Rechazar solicitud
-  document.getElementById('rejectRequestBtn').addEventListener('click', rejectPairRequest);
+  rejectRequestBtn.addEventListener('click', rejectPairRequest);
   
   // Escuchar solicitudes entrantes
   listenForIncomingRequests();
+  
+  // Marcar como configurado
+  pairingListenersSetup = true;
+  console.log('✓ Listeners de emparejamiento configurados');
+}
+
+// Función de fallback para copiar al portapapeles
+function fallbackCopyTextToClipboard(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  
+  // Evitar scroll al textarea
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  textArea.style.top = '-999999px';
+  document.body.appendChild(textArea);
+  
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      showNotification('Código copiado al portapapeles', 'success');
+    } else {
+      showNotification('Error al copiar código', 'error');
+    }
+  } catch (err) {
+    console.error('✗ Error al copiar con fallback:', err);
+    showNotification('Error al copiar código', 'error');
+  }
+  
+  document.body.removeChild(textArea);
 }
 
 async function sendPairRequest() {
-  const partnerCode = document.getElementById('partnerCodeInput').value.toUpperCase().trim();
+  const partnerCodeInput = document.getElementById('partnerCodeInput');
+  if (!partnerCodeInput) {
+    console.error('✗ Elemento partnerCodeInput no encontrado');
+    showNotification('Error: elemento de entrada no encontrado', 'error');
+    return;
+  }
+  
+  const partnerCode = partnerCodeInput.value.toUpperCase().trim();
   
   if (partnerCode.length !== 6) {
     showNotification('El código debe tener 6 caracteres', 'error');
+    return;
+  }
+  
+  if (!AppState.userData || !AppState.userData.codigo) {
+    showNotification('Error: no hay código de usuario disponible', 'error');
     return;
   }
   
@@ -309,9 +395,18 @@ async function sendPairRequest() {
     });
     
     // Mostrar estado pendiente
-    document.getElementById('pendingRequest').classList.remove('hidden');
-    document.getElementById('partnerCodeInput').disabled = true;
-    document.getElementById('sendRequestBtn').disabled = true;
+    const pendingRequestEl = document.getElementById('pendingRequest');
+    const sendRequestBtnEl = document.getElementById('sendRequestBtn');
+    
+    if (pendingRequestEl) {
+      pendingRequestEl.classList.remove('hidden');
+    }
+    if (partnerCodeInput) {
+      partnerCodeInput.disabled = true;
+    }
+    if (sendRequestBtnEl) {
+      sendRequestBtnEl.disabled = true;
+    }
     
     showNotification('Solicitud enviada', 'success');
     
@@ -337,9 +432,19 @@ async function cancelPairRequest() {
       });
     }
     
-    document.getElementById('pendingRequest').classList.add('hidden');
-    document.getElementById('partnerCodeInput').disabled = false;
-    document.getElementById('sendRequestBtn').disabled = false;
+    const pendingRequestEl = document.getElementById('pendingRequest');
+    const partnerCodeInputEl = document.getElementById('partnerCodeInput');
+    const sendRequestBtnEl = document.getElementById('sendRequestBtn');
+    
+    if (pendingRequestEl) {
+      pendingRequestEl.classList.add('hidden');
+    }
+    if (partnerCodeInputEl) {
+      partnerCodeInputEl.disabled = false;
+    }
+    if (sendRequestBtnEl) {
+      sendRequestBtnEl.disabled = false;
+    }
     
     showNotification('Solicitud cancelada', 'success');
     
@@ -357,8 +462,15 @@ function listenForIncomingRequests() {
       
       if (data.pareja && data.pareja.status === 'pending' && data.pareja.from) {
         // Mostrar solicitud entrante
-        document.getElementById('incomingRequest').classList.remove('hidden');
-        document.getElementById('requesterName').textContent = data.pareja.fromName;
+        const incomingRequestEl = document.getElementById('incomingRequest');
+        const requesterNameEl = document.getElementById('requesterName');
+        
+        if (incomingRequestEl) {
+          incomingRequestEl.classList.remove('hidden');
+        }
+        if (requesterNameEl) {
+          requesterNameEl.textContent = data.pareja.fromName;
+        }
       }
     });
 }
@@ -416,7 +528,10 @@ async function rejectPairRequest() {
       pareja: null
     });
     
-    document.getElementById('incomingRequest').classList.add('hidden');
+    const incomingRequestEl = document.getElementById('incomingRequest');
+    if (incomingRequestEl) {
+      incomingRequestEl.classList.add('hidden');
+    }
     
     showNotification('Solicitud rechazada', 'success');
     
@@ -553,11 +668,6 @@ function loadSectionData(section) {
 function showAuthScreen() {
   hideAllScreens();
   document.getElementById('authScreen').classList.remove('hidden');
-}
-
-function showPairingScreen() {
-  hideAllScreens();
-  document.getElementById('pairingScreen').classList.remove('hidden');
 }
 
 function showMainApp() {
@@ -2075,29 +2185,56 @@ async function loadPartnerLocation() {
 // ============================================
 // PERFIL
 // ============================================
+// Flag para evitar listeners duplicados en perfil
+let profileListenersSetup = false;
+
 async function loadProfile() {
   if (!AppState.userData) return;
   
   // Información del usuario
-  document.getElementById('profilePhoto').src = AppState.userData.foto || '';
-  document.getElementById('profileName').textContent = AppState.userData.nombre;
-  document.getElementById('profileEmail').textContent = AppState.userData.email;
-  document.getElementById('profileCoupleCode').textContent = AppState.userData.codigo;
-  document.getElementById('profileMemberSince').textContent = 
-    AppState.userData.creado ? formatFirestoreDate(AppState.userData.creado) : '--';
+  const profilePhotoEl = document.getElementById('profilePhoto');
+  const profileNameEl = document.getElementById('profileName');
+  const profileEmailEl = document.getElementById('profileEmail');
+  const profileCoupleCodeEl = document.getElementById('profileCoupleCode');
+  const profileMemberSinceEl = document.getElementById('profileMemberSince');
+  
+  if (profilePhotoEl) profilePhotoEl.src = AppState.userData.foto || '';
+  if (profileNameEl) profileNameEl.textContent = AppState.userData.nombre;
+  if (profileEmailEl) profileEmailEl.textContent = AppState.userData.email;
+  if (profileCoupleCodeEl) profileCoupleCodeEl.textContent = AppState.userData.codigo || '--';
+  if (profileMemberSinceEl) {
+    profileMemberSinceEl.textContent = 
+      AppState.userData.creado ? formatFirestoreDate(AppState.userData.creado) : '--';
+  }
   
   // Información de la pareja
   if (AppState.coupleData) {
-    document.getElementById('profileAnniversary').textContent = 
-      AppState.coupleData.aniversario ? formatFirestoreDate(AppState.coupleData.aniversario) : '--';
-    document.getElementById('profileFirstDate').textContent = 
-      AppState.coupleData.primeraCita ? formatFirestoreDate(AppState.coupleData.primeraCita) : '--';
-    document.getElementById('profileSong').textContent = 
-      AppState.coupleData.cancionFavorita || '--';
+    const profileAnniversaryEl = document.getElementById('profileAnniversary');
+    const profileFirstDateEl = document.getElementById('profileFirstDate');
+    const profileSongEl = document.getElementById('profileSong');
+    
+    if (profileAnniversaryEl) {
+      profileAnniversaryEl.textContent = 
+        AppState.coupleData.aniversario ? formatFirestoreDate(AppState.coupleData.aniversario) : '--';
+    }
+    if (profileFirstDateEl) {
+      profileFirstDateEl.textContent = 
+        AppState.coupleData.primeraCita ? formatFirestoreDate(AppState.coupleData.primeraCita) : '--';
+    }
+    if (profileSongEl) {
+      profileSongEl.textContent = AppState.coupleData.cancionFavorita || '--';
+    }
   }
   
-  // Configurar listener para desvincular
-  document.getElementById('unlinkPartnerBtn').addEventListener('click', unlinkPartner);
+  // Configurar listener para desvincular (solo una vez)
+  if (!profileListenersSetup) {
+    const unlinkPartnerBtn = document.getElementById('unlinkPartnerBtn');
+    if (unlinkPartnerBtn) {
+      unlinkPartnerBtn.addEventListener('click', unlinkPartner);
+      profileListenersSetup = true;
+      console.log('✓ Listener de perfil configurado');
+    }
+  }
 }
 
 // ============================================
