@@ -227,6 +227,30 @@ function setupPairingListeners() {
     });
   });
   
+  // Regenerar código
+  document.getElementById('regenerateCodeBtn').addEventListener('click', async () => {
+    if (!confirm('¿Estás seguro de que quieres generar un nuevo código? Tu código actual dejará de ser válido.')) {
+      return;
+    }
+    
+    try {
+      const db = getDB();
+      const newCode = generateCoupleCode();
+      
+      await db.collection('users').doc(AppState.currentUser.uid).update({
+        codigo: newCode
+      });
+      
+      AppState.userData.codigo = newCode;
+      document.getElementById('myCoupleCode').textContent = newCode;
+      
+      showNotification('Nuevo código generado: ' + newCode, 'success');
+    } catch (error) {
+      console.error('✗ Error al regenerar código:', error);
+      showNotification('Error al regenerar código', 'error');
+    }
+  });
+  
   // Enviar solicitud
   document.getElementById('sendRequestBtn').addEventListener('click', sendPairRequest);
   
