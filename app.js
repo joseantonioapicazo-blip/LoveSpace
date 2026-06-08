@@ -60,12 +60,18 @@ function setupAuthListeners() {
   
   // Listener de estado de autenticación
   auth.onAuthStateChanged(async (user) => {
+    console.log('AUTH USER:', user);
     if (user) {
       AppState.currentUser = user;
       console.log('✓ Usuario autenticado:', user.email);
       
+      console.log('ANTES DE loadUserData');
       // Cargar datos del usuario
       await loadUserData(user.uid);
+      console.log('DESPUÉS DE loadUserData');
+      
+      console.log('AppState.userData:', AppState.userData);
+      console.log('AppState.userData.codigo:', AppState.userData?.codigo);
       
       // Verificar si tiene pareja
       if (AppState.userData.coupleId) {
@@ -208,6 +214,9 @@ async function loadCoupleData(coupleId) {
 function showPairingScreen() {
   hideAllScreens();
   document.getElementById('pairingScreen').classList.remove('hidden');
+  
+  console.log('ANTES DE showPairingScreen');
+  console.log('CONTENIDO ACTUAL DEL HTML:', document.getElementById('myCoupleCode')?.textContent);
   
   // Mostrar código del usuario
   if (AppState.userData) {
