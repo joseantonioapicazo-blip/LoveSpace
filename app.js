@@ -65,22 +65,10 @@ function setupAuthListeners() {
       AppState.currentUser = user;
       console.log('✓ Usuario autenticado:', user.email);
       
-      console.log('ANTES DE loadUserData');
-      // Cargar datos del usuario
-      await loadUserData(user.uid);
-      console.log('DESPUÉS DE loadUserData');
+      // Iniciar listener principal de datos de usuario en tiempo real
+      listenToUserData(user.uid);
       
-      console.log('AppState.userData:', AppState.userData);
-      console.log('AppState.userData.codigo:', AppState.userData?.codigo);
-      
-      // Verificar si tiene pareja
-      if (AppState.userData.coupleId) {
-        AppState.coupleId = AppState.userData.coupleId;
-        await loadCoupleData(AppState.coupleId);
-        showMainApp();
-      } else {
-        showPairingScreen();
-      }
+      // La pantalla correcta se mostrará automáticamente cuando el listener reciba los primeros datos
     } else {
       AppState.currentUser = null;
       AppState.userData = null;
@@ -140,6 +128,10 @@ async function signOut() {
     const auth = getAuth();
     await auth.signOut();
     
+    // Limpiar todos los listeners activos
+    AppState.listeners.forEach(unsubscribe => unsubscribe());
+    AppState.listeners = [];
+    
     // Limpiar estado
     AppState.currentUser = null;
     AppState.userData = null;
@@ -183,6 +175,102 @@ async function loadUserData(uid) {
   } catch (error) {
     console.error('✗ Error al cargar datos del usuario:', error);
   }
+}
+
+// ============================================
+// LISTENER PRINCIPAL DE DATOS DE USUARIO EN TIEMPO REAL
+// ============================================
+function listenToUserData(uid) {
+  const db = getDB();
+  
+  const unsubscribe = db.collection('users').doc(uid).onSnapshot(async (doc) => {
+    if (!doc.exists) {
+      console.log('✗ Documento de usuario no existe');
+      return;
+    }
+    
+    const data = doc.data();
+    console.log('📡 Datos de usuario actualizados:', data);
+    
+    // Verificar si el usuario tiene código, si no, generar uno
+    if (!data.codigo) {
+      const coupleCode = generateCoupleCode();
+      await db.collection('users').doc(uid).update({
+        codigo: coupleCode
+      });
+      data.codigo = coupleCode;
+      console.log('✓ Código de pareja generado:', coupleCode);
+    }
+    
+    // Actualizar AppState.userData
+    const previousCoupleId = AppState.userData?.coupleId;
+    const previousPareja = AppState.userData?.pareja;
+    
+    AppState.userData = data;
+    
+    // Detectar cambios en coupleId
+    const currentCoupleId = data.coupleId;
+    
+    if (currentCoupleId && !previousCoupleId) {
+      // Se creó un coupleId (se aceptó una solicitud)
+      console.log('✓ coupleId creado:', currentCoupleId);
+      AppState.coupleId = currentCoupleId;
+      await loadCoupleData(currentCoupleId);
+      showMainApp();
+    } else if (!currentCoupleId && previousCoupleId) {
+      // Se eliminó el coupleId (se desvinculó la pareja)
+      console.log('✓ coupleId eliminado');
+      AppState.coupleId = null;
+      AppState.coupleData = null;
+      showPairingScreen();
+    } else if (currentCoupleId && currentCoupleId !== previousCoupleId) {
+      // Cambió el coupleId (caso raro, pero posible)
+      console.log('✓ coupleId cambiado:', currentCoupleId);
+      AppState.coupleId = currentCoupleId;
+      await loadCoupleData(currentCoupleId);
+      showMainApp();
+    }
+    
+    // Detectar solicitudes de pareja pendientes
+    const currentPareja = data.pareja;
+    
+    if (currentPareja && currentPareja.status === 'pending' && currentPareja.from) {
+      // Hay una solicitud pendiente
+      console.log('📨 Solicitud de pareja pendiente de:', currentPareja.fromName);
+      const incomingRequestEl = document.getElementById('incomingRequest');
+      const requesterNameEl = document.getElementById('requesterName');
+      
+      if (incomingRequestEl) {
+        incomingRequestEl.classList.remove('hidden');
+      }
+      if (requesterNameEl) {
+        requesterNameEl.textContent = currentPareja.fromName;
+      }
+    } else if (previousPareja && previousPareja.status === 'pending' && (!currentPareja || currentPareja.status !== 'pending')) {
+      // Se rechazó o se aceptó la solicitud
+      console.log('✓ Solicitud de pareja resuelta');
+      const incomingRequestEl = document.getElementById('incomingRequest');
+      if (incomingRequestEl) {
+        incomingRequestEl.classList.add('hidden');
+      }
+    }
+    
+    // Si estamos en la pantalla de emparejamiento y no hay coupleId, actualizar el código mostrado
+    if (!currentCoupleId && data.codigo) {
+      const myCoupleCodeEl = document.getElementById('myCoupleCode');
+      if (myCoupleCodeEl) {
+        myCoupleCodeEl.textContent = data.codigo;
+      }
+    }
+  }, (error) => {
+    console.error('✗ Error en listener de usuario:', error);
+  });
+  
+  // Guardar unsubscribe para limpieza posterior
+  AppState.listeners.push(unsubscribe);
+  console.log('✓ Listener de usuario configurado');
+  
+  return unsubscribe;
 }
 
 async function loadCoupleData(coupleId) {
@@ -313,8 +401,8 @@ function setupPairingListeners() {
   // Rechazar solicitud
   rejectRequestBtn.addEventListener('click', rejectPairRequest);
   
-  // Escuchar solicitudes entrantes
-  listenForIncomingRequests();
+  // NOTA: Ya no necesitamos llamar a listenForIncomingRequests()
+  // El listener principal listenToUserData() maneja la detección de solicitudes pendientes
   
   // Marcar como configurado
   pairingListenersSetup = true;
@@ -462,26 +550,13 @@ async function cancelPairRequest() {
   }
 }
 
+// ============================================
+// FUNCIÓN OBSOLETA - Funcionalidad integrada en listenToUserData()
+// ============================================
 function listenForIncomingRequests() {
-  const db = getDB();
-  
-  db.collection('users').doc(AppState.currentUser.uid)
-    .onSnapshot((doc) => {
-      const data = doc.data();
-      
-      if (data.pareja && data.pareja.status === 'pending' && data.pareja.from) {
-        // Mostrar solicitud entrante
-        const incomingRequestEl = document.getElementById('incomingRequest');
-        const requesterNameEl = document.getElementById('requesterName');
-        
-        if (incomingRequestEl) {
-          incomingRequestEl.classList.remove('hidden');
-        }
-        if (requesterNameEl) {
-          requesterNameEl.textContent = data.pareja.fromName;
-        }
-      }
-    });
+  // Esta función es obsoleta. Su funcionalidad ha sido integrada en listenToUserData()
+  // que escucha todos los cambios en el documento del usuario en tiempo real.
+  console.warn('⚠️ listenForIncomingRequests() es obsoleta. Usar listenToUserData() en su lugar.');
 }
 
 async function acceptPairRequest() {
@@ -518,10 +593,9 @@ async function acceptPairRequest() {
     
     showNotification('¡Pareja conectada!', 'success');
     
-    // Recargar datos
-    AppState.coupleId = coupleId;
-    await loadCoupleData(coupleId);
-    showMainApp();
+    // NOTA: Ya no necesitamos llamar manualmente a loadCoupleData() y showMainApp()
+    // El listener principal listenToUserData() detectará el cambio en coupleId
+    // y ejecutará esas acciones automáticamente para ambos usuarios
     
   } catch (error) {
     console.error('✗ Error al aceptar solicitud:', error);
