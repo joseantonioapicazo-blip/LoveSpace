@@ -2207,23 +2207,47 @@ async function addLetter(recipient, openDate, content) {
 // UBICACIÓN
 // ============================================
 async function loadLocation() {
+  if (!AppState.coupleId || !AppState.currentUser) return;
+  
+  try {
+    // Obtener ID de la pareja
+    const partnerId = AppState.coupleData?.users?.find(id => id !== AppState.currentUser.uid);
+    
+    if (!partnerId) {
+      console.log('⚠ No hay pareja conectada');
+      return;
+    }
+    
+    // Inicializar sistema de ubicación con el nuevo módulo
+    if (typeof initializeLocationSystem === 'function') {
+      initializeLocationSystem(
+        AppState.coupleId,
+        AppState.currentUser.uid,
+        partnerId
+      );
+      console.log('✓ Sistema de ubicación nuevo inicializado');
+    } else {
+      console.error('✗ location.js no está cargado, usando sistema antiguo');
+      // Fallback al sistema antiguo si location.js no está disponible
+      loadLocationFallback();
+    }
+  } catch (error) {
+    console.error('✗ Error al cargar ubicación:', error);
+  }
+}
+
+// Fallback al sistema antiguo (mantenido por compatibilidad)
+async function loadLocationFallback() {
   if (!AppState.coupleId) return;
   
   try {
-    // Solicitar ubicación
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          
-          // Actualizar ubicación del usuario
           await updateLocation(latitude, longitude);
-          
-          // Mostrar ubicación
           document.getElementById('myLocation').textContent = 
             `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-          
-          // Cargar ubicación de la pareja
           await loadPartnerLocation();
         },
         (error) => {
@@ -2439,6 +2463,20 @@ function setupModals() {
   document.getElementById('addEventBtn').addEventListener('click', () => {
     document.getElementById('addEventModal').classList.remove('hidden');
   });
+  
+  // Botón de actualizar ubicación
+  const refreshLocationBtn = document.getElementById('refreshLocationBtn');
+  if (refreshLocationBtn) {
+    refreshLocationBtn.addEventListener('click', () => {
+      if (typeof forceLocationUpdate === 'function') {
+        forceLocationUpdate();
+        showNotification('Ubicación actualizada', 'success');
+      } else {
+        console.error('✗ forceLocationUpdate no disponible');
+        showNotification('Error al actualizar ubicación', 'error');
+      }
+    });
+  }
   
   document.getElementById('closeAddEventModal').addEventListener('click', () => {
     document.getElementById('addEventModal').classList.add('hidden');
