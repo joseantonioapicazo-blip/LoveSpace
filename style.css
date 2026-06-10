@@ -1472,12 +1472,13 @@ body {
 }
 
 .location-map {
-  height: 300px;
+  height: 400px;
   background: var(--background);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.location-info-card {
+  margin-top: var(--spacing-lg);
 }
 
 .location-info {
@@ -1504,6 +1505,80 @@ body {
   font-weight: 500;
   color: var(--text-primary);
   font-size: 0.9rem;
+}
+
+/* Distance Card */
+.distance-card {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border: none;
+  margin-bottom: var(--spacing-lg);
+}
+
+.distance-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.distance-icon {
+  font-size: 3rem;
+}
+
+.distance-info {
+  flex: 1;
+}
+
+.distance-text {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+
+.location-status {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.location-status.status-active {
+  color: #90EE90;
+}
+
+.location-status.status-warning {
+  color: #FFD700;
+}
+
+.location-status.status-inactive {
+  color: #FF6B6B;
+}
+
+/* Leaflet Custom Markers */
+.location-marker {
+  background: none;
+  border: none;
+}
+
+.marker-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: transform var(--transition-normal);
+}
+
+.marker-icon:hover {
+  transform: scale(1.2);
+}
+
+/* Leaflet Popup Customization */
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.leaflet-popup-content {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--text-primary);
 }
 
 /* ============================================
