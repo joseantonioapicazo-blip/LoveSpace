@@ -24,9 +24,9 @@ const LocationState = {
   partnerId: null
 };
 
-// ============================================
+// ================================
 // INICIALIZACIÓN DEL SISTEMA
-// ============================================
+// ================================
 function initializeLocationSystem(coupleId, currentUserId, partnerId) {
   console.log('📍 Inicializando sistema de ubicación...');
   
