@@ -664,7 +664,7 @@ async function unlinkPartner() {
 // NAVEGACIÓN
 // ============================================
 function setupNavigation() {
-  // Navegación inferior
+  // Navegación inferior (móvil)
   const navItems = document.querySelectorAll('.nav-item');
   navItems.forEach(item => {
     item.addEventListener('click', () => {
@@ -672,7 +672,16 @@ function setupNavigation() {
       navigateTo(section);
     });
   });
-  
+
+  // Navegación lateral (desktop)
+  const sidebarItems = document.querySelectorAll('.sidebar-item');
+  sidebarItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const section = item.dataset.section;
+      navigateTo(section);
+    });
+  });
+
   // Accesos rápidos
   const quickAccessCards = document.querySelectorAll('.quick-access-card');
   quickAccessCards.forEach(card => {
@@ -686,26 +695,34 @@ function setupNavigation() {
 function navigateTo(section) {
   // Actualizar estado
   AppState.currentSection = section;
-  
+
   // Ocultar todas las secciones
   document.querySelectorAll('.content-section').forEach(s => {
     s.classList.remove('active');
   });
-  
+
   // Mostrar sección seleccionada
   const targetSection = document.getElementById(section + 'Section');
   if (targetSection) {
     targetSection.classList.add('active');
   }
-  
-  // Actualizar navegación
+
+  // Actualizar navegación inferior (móvil)
   document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.remove('active');
     if (item.dataset.section === section) {
       item.classList.add('active');
     }
   });
-  
+
+  // Actualizar navegación lateral (desktop)
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.classList.remove('active');
+    if (item.dataset.section === section) {
+      item.classList.add('active');
+    }
+  });
+
   // Cargar datos específicos de la sección
   loadSectionData(section);
 }
