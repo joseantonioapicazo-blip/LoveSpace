@@ -967,13 +967,20 @@ function updateCounter(anniversaryDate) {
   const minutes = Math.floor(diff / (1000 * 60)) % 60;
   const seconds = Math.floor(diff / 1000) % 60;
   
-  // Actualizar DOM
-  document.getElementById('counterYears').textContent = years;
-  document.getElementById('counterMonths').textContent = months;
-  document.getElementById('counterDays').textContent = days;
-  document.getElementById('counterHours').textContent = hours;
-  document.getElementById('counterMinutes').textContent = minutes;
-  document.getElementById('counterSeconds').textContent = seconds;
+  // Actualizar DOM solo si los elementos existen
+  const counterYears = document.getElementById('counterYears');
+  const counterMonths = document.getElementById('counterMonths');
+  const counterDays = document.getElementById('counterDays');
+  const counterHours = document.getElementById('counterHours');
+  const counterMinutes = document.getElementById('counterMinutes');
+  const counterSeconds = document.getElementById('counterSeconds');
+  
+  if (counterYears) counterYears.textContent = years;
+  if (counterMonths) counterMonths.textContent = months;
+  if (counterDays) counterDays.textContent = days;
+  if (counterHours) counterHours.textContent = hours;
+  if (counterMinutes) counterMinutes.textContent = minutes;
+  if (counterSeconds) counterSeconds.textContent = seconds;
 }
 
 // ============================================
@@ -2795,3 +2802,4 @@ function showNotification(message, type = 'success') {
 // INICIAR APLICACIÓN
 // ============================================
 console.log('LoveSpace cargando...');
+
