@@ -2207,19 +2207,30 @@ async function addLetter(recipient, openDate, content) {
 // UBICACIÓN
 // ============================================
 async function loadLocation() {
-  if (!AppState.coupleId || !AppState.currentUser) return;
+  console.log('📍 loadLocation() llamado');
+  console.log('  - AppState.coupleId:', AppState.coupleId);
+  console.log('  - AppState.currentUser:', AppState.currentUser);
+  console.log('  - AppState.coupleData:', AppState.coupleData);
+  
+  if (!AppState.coupleId || !AppState.currentUser) {
+    console.log('⚠ No hay coupleId o currentUser, retornando');
+    return;
+  }
   
   try {
     // Obtener ID de la pareja
     const partnerId = AppState.coupleData?.users?.find(id => id !== AppState.currentUser.uid);
+    console.log('  - partnerId encontrado:', partnerId);
     
     if (!partnerId) {
       console.log('⚠ No hay pareja conectada');
+      showNotification('No hay pareja conectada para compartir ubicación', 'warning');
       return;
     }
     
     // Inicializar sistema de ubicación con el nuevo módulo
     if (typeof initializeLocationSystem === 'function') {
+      console.log('✓ initializeLocationSystem está disponible, llamándolo...');
       initializeLocationSystem(
         AppState.coupleId,
         AppState.currentUser.uid,
@@ -2233,6 +2244,7 @@ async function loadLocation() {
     }
   } catch (error) {
     console.error('✗ Error al cargar ubicación:', error);
+    showNotification('Error al cargar ubicación', 'error');
   }
 }
 
