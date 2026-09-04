@@ -29,21 +29,30 @@ const LocationState = {
 // ================================
 function initializeLocationSystem(coupleId, currentUserId, partnerId) {
   console.log('📍 Inicializando sistema de ubicación...');
+  console.log('  - coupleId:', coupleId);
+  console.log('  - currentUserId:', currentUserId);
+  console.log('  - partnerId:', partnerId);
+  
+  // Limpiar sistema anterior si existe (sin limpiar IDs)
+  cleanupLocationSystem(false);
   
   LocationState.coupleId = coupleId;
   LocationState.currentUserId = currentUserId;
   LocationState.partnerId = partnerId;
   
-  // Inicializar mapa
-  initializeMap();
-  
-  // Iniciar seguimiento de ubicación
-  startLocationTracking();
-  
-  // Escuchar ubicación de la pareja
-  listenToPartnerLocation();
-  
-  console.log('✓ Sistema de ubicación inicializado');
+  // Esperar un momento para que el DOM esté listo
+  setTimeout(() => {
+    // Inicializar mapa
+    initializeMap();
+    
+    // Iniciar seguimiento de ubicación
+    startLocationTracking();
+    
+    // Escuchar ubicación de la pareja
+    listenToPartnerLocation();
+    
+    console.log('✓ Sistema de ubicación inicializado');
+  }, 200);
 }
 
 // ============================================
@@ -61,16 +70,32 @@ function initializeMap() {
     return;
   }
   
-  // Crear mapa
-  LocationState.map = L.map('locationMap').setView([0, 0], 2);
-  
-  // Agregar capa de OpenStreetMap
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    maxZoom: 19
-  }).addTo(LocationState.map);
-  
-  console.log('✓ Mapa Leaflet inicializado');
+  // Esperar a que el contenedor sea visible y tenga dimensiones
+  setTimeout(() => {
+    const rect = mapContainer.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      console.warn('⚠ El contenedor del mapa no tiene dimensiones, reintentando...');
+      setTimeout(initializeMap, 500);
+      return;
+    }
+    
+    // Crear mapa
+    LocationState.map = L.map('locationMap').setView([0, 0], 2);
+    
+    // Agregar capa de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(LocationState.map);
+    
+    // Invalidar tamaño del mapa
+    setTimeout(() => {
+      if (LocationState.map) {
+        LocationState.map.invalidateSize();
+        console.log('✓ Mapa Leaflet inicializado y tamaño invalidado');
+      }
+    }, 100);
+  }, 100);
 }
 
 // ============================================
@@ -118,6 +143,7 @@ function stopLocationTracking() {
 // MANEJO DE ACTUALIZACIONES DE UBICACIÓN
 // ============================================
 function handleLocationUpdate(position) {
+  console.log('📍 Actualización de ubicación recibida');
   const { latitude, longitude, accuracy, speed } = position.coords;
   const currentTime = Date.now();
   
@@ -129,16 +155,23 @@ function handleLocationUpdate(position) {
     actualizado: new Date(currentTime)
   };
   
+  console.log('  - Latitud:', latitude);
+  console.log('  - Longitud:', longitude);
+  console.log('  - Precisión:', accuracy);
+  
+  // Siempre actualizar estado local para que el mapa funcione
+  LocationState.lastLocation = newLocation;
+  LocationState.lastUpdateTime = currentTime;
+  
   // Verificar si debemos actualizar en Firestore
   const shouldUpdate = shouldUpdateLocation(newLocation);
   
   if (shouldUpdate) {
     // Actualizar en Firestore
     updateLocationInFirestore(newLocation);
-    
-    // Actualizar estado local
-    LocationState.lastLocation = newLocation;
-    LocationState.lastUpdateTime = currentTime;
+    console.log('✓ Ubicación actualizada en Firestore');
+  } else {
+    console.log('⚠ Ubicación no actualizada en Firestore (optimización)');
   }
   
   // Actualizar marcador en el mapa siempre
@@ -151,6 +184,9 @@ function handleLocationUpdate(position) {
   if (LocationState.partnerLocation) {
     calculateAndShowDistance(newLocation, LocationState.partnerLocation);
   }
+  
+  // Actualizar estado de conexión
+  updateLocationStatus('active');
 }
 
 function shouldUpdateLocation(newLocation) {
@@ -453,7 +489,7 @@ function forceLocationUpdate() {
 // ============================================
 // LIMPIEZA
 // ============================================
-function cleanupLocationSystem() {
+function cleanupLocationSystem(cleanupIds = true) {
   stopLocationTracking();
   stopListeningToPartnerLocation();
   
@@ -467,9 +503,12 @@ function cleanupLocationSystem() {
   LocationState.lastLocation = null;
   LocationState.lastUpdateTime = null;
   LocationState.partnerLocation = null;
-  LocationState.coupleId = null;
-  LocationState.currentUserId = null;
-  LocationState.partnerId = null;
+  
+  if (cleanupIds) {
+    LocationState.coupleId = null;
+    LocationState.currentUserId = null;
+    LocationState.partnerId = null;
+  }
   
   console.log('✓ Sistema de ubicación limpiado');
 }
