@@ -40,19 +40,42 @@ function initializeLocationSystem(coupleId, currentUserId, partnerId) {
   LocationState.currentUserId = currentUserId;
   LocationState.partnerId = partnerId;
   
-  // Esperar un momento para que el DOM esté listo
-  setTimeout(() => {
-    // Inicializar mapa
-    initializeMap();
-    
-    // Iniciar seguimiento de ubicación
-    startLocationTracking();
-    
-    // Escuchar ubicación de la pareja
-    listenToPartnerLocation();
-    
-    console.log('✓ Sistema de ubicación inicializado');
-  }, 200);
+  // Solicitar permisos de ubicación primero con getCurrentPosition
+  if (navigator.geolocation) {
+    console.log('✓ Geolocation disponible, solicitando permisos...');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log('✓ Permisos de ubicación concedidos');
+        console.log('  - Primera ubicación:', position.coords.latitude, position.coords.longitude);
+        
+        // Esperar un momento para que el DOM esté listo
+        setTimeout(() => {
+          // Inicializar mapa
+          initializeMap();
+          
+          // Iniciar seguimiento de ubicación
+          startLocationTracking();
+          
+          // Escuchar ubicación de la pareja
+          listenToPartnerLocation();
+          
+          console.log('✓ Sistema de ubicación inicializado');
+        }, 200);
+      },
+      (error) => {
+        console.error('✗ Error al solicitar permisos de ubicación:', error);
+        handleLocationError(error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  } else {
+    console.error('✗ Geolocation no soportado');
+    showLocationError('Tu navegador no soporta geolocalización');
+  }
 }
 
 // ============================================
@@ -137,6 +160,39 @@ function stopLocationTracking() {
   
   LocationState.isTracking = false;
   console.log('✓ Seguimiento de ubicación detenido');
+}
+
+function handleLocationError(error) {
+  console.error('✗ Error de geolocalización:', error);
+  
+  let message = 'Error al obtener ubicación';
+  
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      message = 'Permiso de ubicación denegado. Por favor permite el acceso a tu ubicación.';
+      console.error('  - Permiso denegado por el usuario');
+      break;
+    case error.POSITION_UNAVAILABLE:
+      message = 'Ubicación no disponible. Verifica tu GPS.';
+      console.error('  - Ubicación no disponible');
+      break;
+    case error.TIMEOUT:
+      message = 'Tiempo de espera agotado al obtener ubicación.';
+      console.error('  - Timeout');
+      break;
+    default:
+      message = 'Error desconocido al obtener ubicación.';
+      console.error('  - Error desconocido');
+  }
+  
+  showLocationError(message);
+  
+  // Actualizar estado de conexión a error
+  const statusEl = document.getElementById('locationStatus');
+  if (statusEl) {
+    statusEl.innerHTML = '🔴 Error: ' + message;
+    statusEl.className = 'location-status status-inactive';
+  }
 }
 
 // ============================================
@@ -565,3 +621,5 @@ if (typeof module !== 'undefined' && module.exports) {
     forceLocationUpdate
   };
 }
+
+console.log('✓ location.js cargado correctamente');
