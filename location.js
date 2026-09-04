@@ -67,7 +67,7 @@ function initializeLocationSystem(coupleId, currentUserId, partnerId) {
         handleLocationError(error);
       },
       {
-        enableHighAccuracy: true,
+        enableHighAccuracy: false, // Cambiado a false para evitar error de Google 403
         timeout: 10000,
         maximumAge: 0
       }
@@ -122,46 +122,8 @@ function initializeMap() {
 }
 
 // ============================================
-// SEGUIMIENTO DE UBICACIÓN EN TIEMPO REAL
+// MANEJO DE ERRORES DE UBICACIÓN
 // ============================================
-function startLocationTracking() {
-  if (!navigator.geolocation) {
-    console.error('✗ Geolocation no soportado');
-    showLocationError('Tu navegador no soporta geolocalización');
-    return;
-  }
-  
-  if (LocationState.isTracking) {
-    console.log('⚠ El seguimiento ya está activo');
-    return;
-  }
-  
-  LocationState.isTracking = true;
-  
-  // Usar watchPosition para seguimiento continuo
-  LocationState.watchId = navigator.geolocation.watchPosition(
-    handleLocationUpdate,
-    handleLocationError,
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    }
-  );
-  
-  console.log('✓ Seguimiento de ubicación iniciado');
-}
-
-function stopLocationTracking() {
-  if (LocationState.watchId !== null) {
-    navigator.geolocation.clearWatch(LocationState.watchId);
-    LocationState.watchId = null;
-  }
-  
-  LocationState.isTracking = false;
-  console.log('✓ Seguimiento de ubicación detenido');
-}
-
 function handleLocationError(error) {
   console.error('✗ Error de geolocalización:', error);
   
@@ -193,6 +155,47 @@ function handleLocationError(error) {
     statusEl.innerHTML = '🔴 Error: ' + message;
     statusEl.className = 'location-status status-inactive';
   }
+}
+
+// ============================================
+// SEGUIMIENTO DE UBICACIÓN EN TIEMPO REAL
+// ============================================
+function startLocationTracking() {
+  if (!navigator.geolocation) {
+    console.error('✗ Geolocation no soportado');
+    showLocationError('Tu navegador no soporta geolocalización');
+    return;
+  }
+  
+  if (LocationState.isTracking) {
+    console.log('⚠ El seguimiento ya está activo');
+    return;
+  }
+  
+  LocationState.isTracking = true;
+  
+  // Usar watchPosition para seguimiento continuo
+  LocationState.watchId = navigator.geolocation.watchPosition(
+    handleLocationUpdate,
+    handleLocationError,
+    {
+      enableHighAccuracy: false, // Cambiado a false para evitar error de Google 403
+      timeout: 10000,
+      maximumAge: 0
+    }
+  );
+  
+  console.log('✓ Seguimiento de ubicación iniciado');
+}
+
+function stopLocationTracking() {
+  if (LocationState.watchId !== null) {
+    navigator.geolocation.clearWatch(LocationState.watchId);
+    LocationState.watchId = null;
+  }
+  
+  LocationState.isTracking = false;
+  console.log('✓ Seguimiento de ubicación detenido');
 }
 
 // ============================================
@@ -534,7 +537,7 @@ function forceLocationUpdate() {
         showLocationError('Error al obtener ubicación');
       },
       {
-        enableHighAccuracy: true,
+        enableHighAccuracy: false, // Cambiado a false para evitar error de Google 403
         timeout: 10000,
         maximumAge: 0
       }
