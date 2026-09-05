@@ -372,50 +372,120 @@
 
       <!-- CALENDAR SECTION -->
       <section id="calendarSection" class="content-section">
-        <div class="section-header">
-          <h1>📅 Calendario</h1>
-          <button id="addEventBtn" class="btn btn-primary btn-small">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Añadir evento
-          </button>
-        </div>
-        
-        <!-- Calendar Navigation -->
-        <div class="calendar-nav">
-          <button id="prevMonthBtn" class="btn btn-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="15 18 9 12 15 6"/>
-            </svg>
-          </button>
-          <h2 id="currentMonthYear">Enero 2024</h2>
-          <button id="nextMonthBtn" class="btn btn-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-          </button>
-        </div>
-        
-        <!-- Calendar Grid -->
-        <div class="calendar-grid">
-          <div class="calendar-day-header">Dom</div>
-          <div class="calendar-day-header">Lun</div>
-          <div class="calendar-day-header">Mar</div>
-          <div class="calendar-day-header">Mié</div>
-          <div class="calendar-day-header">Jue</div>
-          <div class="calendar-day-header">Vie</div>
-          <div class="calendar-day-header">Sáb</div>
-          <div id="calendarDays" class="calendar-days"></div>
-        </div>
-        
-        <!-- Selected Day Events -->
-        <div id="selectedDayEvents" class="card day-events-card hidden">
-          <h3 id="selectedDateTitle">Eventos del día</h3>
-          <div id="dayEventsList" class="day-events-list"></div>
+        <div class="calendar-container">
+          <!-- Calendar Header -->
+          <div class="calendar-header">
+            <div class="calendar-title">
+              <h1>📅 Calendario</h1>
+              <p>Organiza tus momentos especiales</p>
+            </div>
+            <button id="calendarAddEvent" class="btn btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Añadir evento
+            </button>
+          </div>
+          
+          <!-- Calendar Navigation -->
+          <div class="calendar-navigation">
+            <button id="calendarPrevMonth" class="calendar-nav-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            </button>
+            <h2 id="calendarMonthTitle">Enero 2024</h2>
+            <button id="calendarNextMonth" class="calendar-nav-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+          </div>
+          
+          <button id="calendarToday" class="calendar-today-btn">Hoy</button>
+          
+          <!-- Calendar Grid -->
+          <div class="calendar-wrapper">
+            <div class="calendar-weekdays">
+              <div class="calendar-weekday">Dom</div>
+              <div class="calendar-weekday">Lun</div>
+              <div class="calendar-weekday">Mar</div>
+              <div class="calendar-weekday">Mié</div>
+              <div class="calendar-weekday">Jue</div>
+              <div class="calendar-weekday">Vie</div>
+              <div class="calendar-weekday">Sáb</div>
+            </div>
+            <div id="calendarGrid" class="calendar-grid"></div>
+          </div>
+          
+          <!-- Events Panel -->
+          <div id="calendarEventsPanel" class="calendar-events-panel hidden">
+            <div class="calendar-events-header">
+              <h3 id="calendarEventsTitle">Eventos del día</h3>
+              <button class="calendar-close-panel" onclick="document.getElementById('calendarEventsPanel').classList.add('hidden')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+            <div id="calendarEventsList" class="calendar-events-list"></div>
+          </div>
         </div>
       </section>
+      
+      <!-- Calendar Event Modal -->
+      <div id="calendarEventModal" class="modal hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Añadir evento</h2>
+            <button class="modal-close" onclick="closeEventModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <form id="calendarEventForm" class="modal-body">
+            <div class="form-group">
+              <label for="eventTitle">Título *</label>
+              <input type="text" id="eventTitle" required placeholder="Ej: Cena romántica">
+            </div>
+            <div class="form-group">
+              <label for="eventDate">Fecha *</label>
+              <input type="date" id="eventDate" required>
+            </div>
+            <div class="form-group">
+              <label for="eventDescription">Descripción</label>
+              <textarea id="eventDescription" rows="3" placeholder="Detalles del evento..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="eventColor">Color</label>
+              <div class="color-picker">
+                <input type="radio" name="eventColor" value="#ff6b6b" id="colorRed" checked>
+                <label for="colorRed" class="color-option" style="background: #ff6b6b"></label>
+                
+                <input type="radio" name="eventColor" value="#4ecdc4" id="colorTeal">
+                <label for="colorTeal" class="color-option" style="background: #4ecdc4"></label>
+                
+                <input type="radio" name="eventColor" value="#45b7d1" id="colorBlue">
+                <label for="colorBlue" class="color-option" style="background: #45b7d1"></label>
+                
+                <input type="radio" name="eventColor" value="#f9ca24" id="colorYellow">
+                <label for="colorYellow" class="color-option" style="background: #f9ca24"></label>
+                
+                <input type="radio" name="eventColor" value="#a55eea" id="colorPurple">
+                <label for="colorPurple" class="color-option" style="background: #a55eea"></label>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary" onclick="closeEventModal()">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
 
       <!-- EVENT SECTION (Main Feature) -->
       <section id="eventSection" class="content-section">
@@ -1056,6 +1126,7 @@
   <script src="firebase.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="location.js?v=2"></script>
+  <script src="calendar.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
