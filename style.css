@@ -2365,6 +2365,8 @@ textarea:focus-visible {
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-soft);
   margin-bottom: var(--spacing-xl);
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .calendar-weekdays {
@@ -2386,6 +2388,7 @@ textarea:focus-visible {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: var(--spacing-xs);
+  min-width: 0;
 }
 
 .calendar-cell {
@@ -2640,8 +2643,9 @@ textarea:focus-visible {
 /* Responsive */
 @media (max-width: 768px) {
   .calendar-container {
-    max-width: 98%;
+    max-width: 100%;
     padding: var(--spacing-md) var(--spacing-sm);
+    overflow-x: hidden;
   }
 
   .calendar-header {
@@ -2660,15 +2664,29 @@ textarea:focus-visible {
 
   .calendar-navigation {
     justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   .calendar-navigation h2 {
     font-size: 1rem;
     min-width: auto;
+    flex: 1;
+    text-align: center;
+  }
+
+  .calendar-wrapper {
+    padding: var(--spacing-md);
+    overflow-x: auto;
+  }
+
+  .calendar-grid {
+    gap: 2px;
   }
 
   .calendar-cell {
     min-height: 35px;
+    aspect-ratio: auto;
+    height: 35px;
   }
 
   .calendar-day-number {
@@ -2690,31 +2708,56 @@ textarea:focus-visible {
   .calendar-container {
     max-width: 100%;
     padding: var(--spacing-sm);
+    overflow-x: hidden;
   }
 
   .calendar-title h1 {
     font-size: 1.25rem;
   }
 
+  .calendar-title p {
+    font-size: 0.8rem;
+  }
+
+  .calendar-wrapper {
+    padding: var(--spacing-sm);
+    overflow-x: auto;
+  }
+
+  .calendar-grid {
+    gap: 1px;
+  }
+
   .calendar-cell {
     min-height: 30px;
+    height: 30px;
   }
 
   .calendar-day-number {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
 
   .calendar-weekday {
     font-size: 0.65rem;
+    padding: 2px;
   }
 
   .calendar-nav-btn {
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .calendar-nav-btn svg {
+    width: 16px;
+    height: 16px;
   }
 
   .calendar-today-btn {
-    font-size: 0.8rem;
-    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+
+  .calendar-navigation h2 {
+    font-size: 0.9rem;
   }
 }
