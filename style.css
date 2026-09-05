@@ -2275,7 +2275,7 @@ textarea:focus-visible {
    ============================================ */
 
 .calendar-container {
-  max-width: 95%;
+  max-width: 95%;a
   width: 100%;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
@@ -2373,8 +2373,8 @@ textarea:focus-visible {
 
 .calendar-weekdays {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: var(--spacing-xs);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(2px, 0.5vw, var(--spacing-xs));
   margin-bottom: var(--spacing-sm);
 }
 
