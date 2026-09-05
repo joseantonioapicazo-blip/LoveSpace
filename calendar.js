@@ -87,7 +87,7 @@ function setupCalendarListeners() {
   if (addEventBtn) {
     addEventBtn.addEventListener('click', () => {
       console.log('📅 Botón añadir evento clickeado');
-      openEventModal();
+      calendarOpenEventModal();
     });
   } else {
     console.error('✗ calendarAddEvent no encontrado');
@@ -96,7 +96,7 @@ function setupCalendarListeners() {
   if (eventForm) {
     eventForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      saveEvent();
+      calendarSaveEvent();
     });
   }
 
@@ -195,7 +195,7 @@ function renderCalendarGrid() {
     
     // Click en el día
     cell.addEventListener('click', () => {
-      selectDate(dateStr);
+      calendarSelectDate(dateStr);
     });
     
     calendarGrid.appendChild(cell);
@@ -207,10 +207,10 @@ function renderCalendarGrid() {
 // ============================================
 // SELECCIÓN DE FECHA
 // ============================================
-function selectDate(dateStr) {
+function calendarSelectDate(dateStr) {
   CalendarState.selectedDate = dateStr;
   renderCalendarGrid();
-  showDayEvents(dateStr);
+  calendarShowDayEvents(dateStr);
 }
 
 // ============================================
@@ -269,7 +269,7 @@ async function loadCalendarEvents() {
 // ============================================
 // MOSTRAR EVENTOS DEL DÍA
 // ============================================
-function showDayEvents(dateStr) {
+function calendarShowDayEvents(dateStr) {
   const eventsPanel = document.getElementById('calendarEventsPanel');
   const eventsList = document.getElementById('calendarEventsList');
   const eventsTitle = document.getElementById('calendarEventsTitle');
@@ -293,7 +293,7 @@ function showDayEvents(dateStr) {
           <h4 class="calendar-event-title">${event.titulo}</h4>
           <p class="calendar-event-description">${event.descripcion || ''}</p>
         </div>
-        <button class="calendar-event-delete" onclick="deleteEvent('${event.id}', '${dateStr}')">
+        <button class="calendar-event-delete" onclick="calendarDeleteEvent('${event.id}', '${dateStr}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="3 6 5 6 21 6"/>
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -306,7 +306,7 @@ function showDayEvents(dateStr) {
       <div class="calendar-empty-state">
         <span class="calendar-empty-icon">📅</span>
         <p>No hay eventos este día</p>
-        <button class="btn btn-primary btn-small" onclick="openEventModal('${dateStr}')">
+        <button class="btn btn-primary btn-small" onclick="calendarOpenEventModal('${dateStr}')">
           Añadir evento
         </button>
       </div>
@@ -319,7 +319,7 @@ function showDayEvents(dateStr) {
 // ============================================
 // MODAL PARA AÑADIR EVENTO
 // ============================================
-function openEventModal(dateStr = null) {
+function calendarOpenEventModal(dateStr = null) {
   const modal = document.getElementById('calendarEventModal');
   const form = document.getElementById('calendarEventForm');
   const dateInput = document.getElementById('eventDate');
@@ -341,7 +341,7 @@ function openEventModal(dateStr = null) {
   modal.classList.remove('hidden');
 }
 
-function closeEventModal() {
+function calendarCloseEventModal() {
   const modal = document.getElementById('calendarEventModal');
   if (modal) {
     modal.classList.add('hidden');
@@ -351,7 +351,7 @@ function closeEventModal() {
 // ============================================
 // GUARDAR EVENTO
 // ============================================
-async function saveEvent() {
+async function calendarSaveEvent() {
   const form = document.getElementById('calendarEventForm');
   const titulo = document.getElementById('eventTitle').value;
   const descripcion = document.getElementById('eventDescription').value;
@@ -382,7 +382,7 @@ async function saveEvent() {
     console.log('✓ Evento guardado');
     showNotification('Evento guardado correctamente', 'success');
     
-    closeEventModal();
+    calendarCloseEventModal();
     
     // Recargar eventos
     const eventMonth = eventDate.getMonth();
@@ -399,7 +399,7 @@ async function saveEvent() {
     
     // Si el día está seleccionado, actualizar la vista
     if (CalendarState.selectedDate === fecha) {
-      showDayEvents(fecha);
+      calendarShowDayEvents(fecha);
     }
     
   } catch (error) {
@@ -411,7 +411,7 @@ async function saveEvent() {
 // ============================================
 // ELIMINAR EVENTO
 // ============================================
-async function deleteEvent(eventId, dateStr) {
+async function calendarDeleteEvent(eventId, dateStr) {
   if (!confirm('¿Estás seguro de eliminar este evento?')) return;
   
   try {
@@ -429,8 +429,8 @@ async function deleteEvent(eventId, dateStr) {
     await loadCalendarEvents();
     
     // Actualizar vista del día
-    if (CalendarState.selectedDate === dateStr) {
-      showDayEvents(dateStr);
+    if (CalendarState.selectedDate === fecha) {
+      calendarShowDayEvents(fecha);
     }
     
   } catch (error) {
