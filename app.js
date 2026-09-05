@@ -987,6 +987,15 @@ function updateCounter(anniversaryDate) {
 // CALENDARIO
 // ============================================
 function loadCalendar() {
+  // Usar el nuevo sistema de calendar.js si está disponible
+  if (typeof initializeCalendar === 'function') {
+    console.log('📅 Usando nuevo sistema de calendario');
+    initializeCalendar();
+    return;
+  }
+  
+  // Fallback al sistema antiguo
+  console.log('⚠ Usando sistema antiguo de calendario');
   renderCalendar();
   
   // Listeners de navegación
@@ -2802,4 +2811,3 @@ function showNotification(message, type = 'success') {
 // INICIAR APLICACIÓN
 // ============================================
 console.log('LoveSpace cargando...');
-
