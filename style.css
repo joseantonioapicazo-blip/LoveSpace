@@ -2280,6 +2280,8 @@ textarea:focus-visible {
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
   box-sizing: border-box;
+  max-height: calc(100vh - var(--header-height) - var(--nav-height) - 40px);
+  overflow-y: auto;
 }
 
 .calendar-header {
@@ -2386,8 +2388,8 @@ textarea:focus-visible {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: var(--spacing-xs);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(2px, 0.5vw, var(--spacing-xs));
   min-width: 0;
 }
 
@@ -2402,7 +2404,7 @@ textarea:focus-visible {
   cursor: pointer;
   transition: all var(--transition-normal);
   position: relative;
-  min-height: 45px;
+  min-height: clamp(30px, 4vh, 50px);
 }
 
 .calendar-cell:hover {
@@ -2661,6 +2663,7 @@ textarea:focus-visible {
     overflow-x: hidden;
     box-sizing: border-box;
     margin: 0;
+    max-height: calc(100vh - var(--header-height) - var(--nav-height) - 20px);
   }
 
   .calendar-header {
@@ -2675,11 +2678,11 @@ textarea:focus-visible {
   }
 
   .calendar-title h1 {
-    font-size: 1.5rem;
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
   }
 
   .calendar-title p {
-    font-size: 0.85rem;
+    font-size: clamp(0.75rem, 2.5vw, 0.85rem);
   }
 
   .calendar-navigation {
@@ -2689,7 +2692,7 @@ textarea:focus-visible {
   }
 
   .calendar-navigation h2 {
-    font-size: 1rem;
+    font-size: clamp(0.85rem, 3vw, 1rem);
     min-width: auto;
     flex: 1;
     text-align: center;
@@ -2703,25 +2706,24 @@ textarea:focus-visible {
   }
 
   .calendar-grid {
-    gap: 2px;
+    gap: clamp(1px, 0.3vw, 2px);
     width: 100%;
     min-width: 0;
   }
 
   .calendar-cell {
-    min-height: 32px;
-    aspect-ratio: auto;
-    height: 32px;
+    min-height: clamp(25px, 3.5vh, 32px);
+    aspect-ratio: 1;
     width: 100%;
   }
 
   .calendar-day-number {
-    font-size: 0.75rem;
+    font-size: clamp(0.65rem, 2vw, 0.75rem);
   }
 
   .calendar-weekday {
-    font-size: 0.65rem;
-    padding: 2px;
+    font-size: clamp(0.55rem, 2vw, 0.65rem);
+    padding: clamp(1px, 0.3vw, 2px);
   }
 
   .calendar-event-item {
@@ -2750,60 +2752,61 @@ textarea:focus-visible {
     overflow-x: hidden;
     box-sizing: border-box;
     margin: 0;
+    max-height: calc(100vh - var(--header-height) - var(--nav-height) - 10px);
   }
 
   .calendar-title h1 {
-    font-size: 1.25rem;
+    font-size: clamp(1rem, 4vw, 1.25rem);
   }
 
   .calendar-title p {
-    font-size: 0.75rem;
+    font-size: clamp(0.7rem, 2.5vw, 0.75rem);
   }
 
   .calendar-wrapper {
-    padding: 2px;
+    padding: clamp(1px, 0.2vw, 2px);
     overflow-x: auto;
     max-width: 100%;
     margin: 0;
   }
 
   .calendar-grid {
-    gap: 1px;
+    gap: clamp(1px, 0.2vw, 1px);
     width: 100%;
     min-width: 0;
   }
 
   .calendar-cell {
-    min-height: 26px;
-    height: 26px;
+    min-height: clamp(22px, 3vh, 26px);
+    aspect-ratio: 1;
     width: 100%;
   }
 
   .calendar-day-number {
-    font-size: 0.6rem;
+    font-size: clamp(0.55rem, 2vw, 0.6rem);
   }
 
   .calendar-weekday {
-    font-size: 0.55rem;
-    padding: 1px;
+    font-size: clamp(0.5rem, 2vw, 0.55rem);
+    padding: clamp(1px, 0.2vw, 1px);
   }
 
   .calendar-nav-btn {
-    width: 28px;
-    height: 28px;
+    width: clamp(24px, 6vw, 28px);
+    height: clamp(24px, 6vw, 28px);
   }
 
   .calendar-nav-btn svg {
-    width: 12px;
-    height: 12px;
+    width: clamp(10px, 2.5vw, 12px);
+    height: clamp(10px, 2.5vw, 12px);
   }
 
   .calendar-today-btn {
-    font-size: 0.65rem;
-    padding: 3px 6px;
+    font-size: clamp(0.6rem, 2vw, 0.65rem);
+    padding: clamp(2px, 0.5vw, 3px) clamp(4px, 1vw, 6px);
   }
 
   .calendar-navigation h2 {
-    font-size: 0.8rem;
+    font-size: clamp(0.75rem, 3vw, 0.8rem);
   }
 }
