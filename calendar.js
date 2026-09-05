@@ -37,48 +37,70 @@ function initializeCalendar() {
 // LISTENERS
 // ============================================
 function setupCalendarListeners() {
+  console.log('📅 Configurando listeners del calendario...');
+
   const prevMonthBtn = document.getElementById('calendarPrevMonth');
   const nextMonthBtn = document.getElementById('calendarNextMonth');
   const addEventBtn = document.getElementById('calendarAddEvent');
   const todayBtn = document.getElementById('calendarToday');
   const eventForm = document.getElementById('calendarEventForm');
-  
+
+  console.log(`  - prevMonthBtn: ${prevMonthBtn ? '✓' : '✗'}`);
+  console.log(`  - nextMonthBtn: ${nextMonthBtn ? '✓' : '✗'}`);
+  console.log(`  - addEventBtn: ${addEventBtn ? '✓' : '✗'}`);
+  console.log(`  - todayBtn: ${todayBtn ? '✓' : '✗'}`);
+  console.log(`  - eventForm: ${eventForm ? '✓' : '✗'}`);
+
   if (prevMonthBtn) {
     prevMonthBtn.addEventListener('click', () => {
+      console.log('📅 Botón mes anterior clickeado');
       CalendarState.currentDate.setMonth(CalendarState.currentDate.getMonth() - 1);
       renderCalendarGrid();
       loadCalendarEvents();
     });
+  } else {
+    console.error('✗ calendarPrevMonth no encontrado');
   }
-  
+
   if (nextMonthBtn) {
     nextMonthBtn.addEventListener('click', () => {
+      console.log('📅 Botón mes siguiente clickeado');
       CalendarState.currentDate.setMonth(CalendarState.currentDate.getMonth() + 1);
       renderCalendarGrid();
       loadCalendarEvents();
     });
+  } else {
+    console.error('✗ calendarNextMonth no encontrado');
   }
-  
+
   if (todayBtn) {
     todayBtn.addEventListener('click', () => {
+      console.log('📅 Botón hoy clickeado');
       CalendarState.currentDate = new Date();
       renderCalendarGrid();
       loadCalendarEvents();
     });
+  } else {
+    console.error('✗ calendarToday no encontrado');
   }
-  
+
   if (addEventBtn) {
     addEventBtn.addEventListener('click', () => {
+      console.log('📅 Botón añadir evento clickeado');
       openEventModal();
     });
+  } else {
+    console.error('✗ calendarAddEvent no encontrado');
   }
-  
+
   if (eventForm) {
     eventForm.addEventListener('submit', (e) => {
       e.preventDefault();
       saveEvent();
     });
   }
+
+  console.log('✓ Listeners del calendario configurados');
 }
 
 // ============================================
