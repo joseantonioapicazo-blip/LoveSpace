@@ -2482,15 +2482,21 @@ function setupModals() {
     });
   });
   
-  // Modal de evento
-  document.getElementById('closeEventModal').addEventListener('click', () => {
-    document.getElementById('eventModal').classList.add('hidden');
-  });
+  // Modal de evento (antiguo sistema)
+  const closeEventModal = document.getElementById('closeEventModal');
+  if (closeEventModal) {
+    closeEventModal.addEventListener('click', () => {
+      document.getElementById('eventModal').classList.add('hidden');
+    });
+  }
   
-  // Modal de añadir evento
-  document.getElementById('addEventBtn').addEventListener('click', () => {
-    document.getElementById('addEventModal').classList.remove('hidden');
-  });
+  // Modal de añadir evento (antiguo sistema)
+  const addEventBtn = document.getElementById('addEventBtn');
+  if (addEventBtn) {
+    addEventBtn.addEventListener('click', () => {
+      document.getElementById('addEventModal').classList.remove('hidden');
+    });
+  }
   
   // Botón de actualizar ubicación
   const refreshLocationBtn = document.getElementById('refreshLocationBtn');
