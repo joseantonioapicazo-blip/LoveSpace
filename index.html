@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="Un espacio privado para parejas donde construir y guardar la historia de su relación">
-  <meta name="theme-color" content="#ff6b9d">
+  <meta name="theme-color" content="#8b6251">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>LoveSpace</title>
+  <title>Two-Coffe</title>
   
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%23ff6b9d' width='512' height='512' rx='100'/%3E%3Cpath fill='%23ffffff' d='M256 448l-32-29C128 328 64 272 64 192c0-53 43-96 96-96 35 0 65 19 96 47 31-28 61-47 96-47 53 0 96 43 96 96 0 80-64 136-160 227l-32 29z'/%3E%3C/svg%3E">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%23ff6b9d' width='512' height='512' rx='100'/%3E%3Cpath fill='%23ffffff' d='M256 448l-32-29C128 328 64 272 64 192c0-53 43-96 96-96 35 0 65 19 96 47 31-28 61-47 96-47 53 0 96 43 96 96 0 80-64 136-160 227l-32 29z'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%238b6251' width='512' height='512' rx='100'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='200' fill='white'%3E☕%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%238b6251' width='512' height='512' rx='100'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='200' fill='white'%3E☕%3C/text%3E%3C/svg%3E">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,7 +35,7 @@
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
       </svg>
     </div>
-    <p class="loading-text">Cargando LoveSpace...</p>
+    <p class="loading-text">Cargando Two-Coffe...</p>
   </div>
 
   <!-- ============================================
@@ -47,8 +47,8 @@
         <svg viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
-        <h1>LoveSpace</h1>
-        <p>Tu espacio privado para construir la historia de su relación</p>
+        <h1>Two-Coffe</h1>
+        <p>Un espacio para dos</p>
       </div>
       
       <button id="googleSignInBtn" class="btn btn-primary btn-large">
@@ -122,998 +122,958 @@
   <!-- ============================================
        MAIN APP
        ============================================ -->
-  <div id="mainApp" class="main-app hidden">
-    
-    <!-- HEADER -->
-    <header class="app-header">
-      <div class="header-content">
-        <div class="header-logo">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-          </svg>
-          <span>LoveSpace</span>
-        </div>
-        <div class="header-user">
-          <img id="headerUserPhoto" src="" alt="Usuario" class="user-avatar">
-        </div>
-      </div>
-    </header>
+  <div id="mainApp" class="app hidden">
 
-    <!-- DESKTOP SIDEBAR NAVIGATION -->
-    <aside class="sidebar-nav">
-      <nav class="sidebar-menu">
-        <button class="sidebar-item active" data-section="home" aria-label="Inicio">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
-          </svg>
-          <span>Inicio</span>
+<!-- =========================================
+     SIDEBAR
+========================================= -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="brand">
+        <div class="brand-icon">☕</div>
+
+        <div>
+            <div class="brand-name">two-coffe</div>
+            <div class="brand-subtitle">un espacio para dos</div>
+        </div>
+    </div>
+
+    <nav class="nav">
+
+        <div class="nav-section">Principal</div>
+
+        <button class="nav-item active" data-page="dashboard">
+            <span class="nav-icon">⌂</span>
+            Inicio
         </button>
-        <button class="sidebar-item" data-section="calendar" aria-label="Calendario">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
-          <span>Calendario</span>
+
+        <button class="nav-item" data-page="calendar">
+            <span class="nav-icon">□</span>
+            Calendario
         </button>
-        <button class="sidebar-item" data-section="album" aria-label="Álbum">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
-          </svg>
-          <span>Álbum</span>
+
+        <button class="nav-item" data-page="album">
+            <span class="nav-icon">▧</span>
+            Álbum
         </button>
-        <button class="sidebar-item" data-section="notes" aria-label="Notas">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-            <polyline points="10 9 9 9 8 9"/>
-          </svg>
-          <span>Notas</span>
+
+        <div class="nav-section">Nuestro espacio</div>
+
+        <button class="nav-item" data-page="notes">
+            <span class="nav-icon">▤</span>
+            Notas
         </button>
-        <button class="sidebar-item" data-section="thoughts" aria-label="Pensamientos">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-          </svg>
-          <span>Pensamientos</span>
+
+        <button class="nav-item" data-page="thoughts">
+            <span class="nav-icon">♡</span>
+            Pensamientos
         </button>
-        <button class="sidebar-item" data-section="poems" aria-label="Poemas">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-          </svg>
-          <span>Poemas</span>
+
+        <button class="nav-item" data-page="poems">
+            <span class="nav-icon">≋</span>
+            Poemas
         </button>
-        <button class="sidebar-item" data-section="letters" aria-label="Cartas">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-            <polyline points="22,6 12,13 2,6"/>
-          </svg>
-          <span>Cartas</span>
+
+        <button class="nav-item" data-page="letters">
+            <span class="nav-icon">✉</span>
+            Cartas
         </button>
-        <button class="sidebar-item" data-section="location" aria-label="Ubicación">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-          <span>Ubicación</span>
+
+        <div class="nav-section">Pareja</div>
+
+        <button class="nav-item" data-page="location">
+            <span class="nav-icon">⌖</span>
+            Ubicación
         </button>
-        <button class="sidebar-item" data-section="event" aria-label="Evento">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-          </svg>
-          <span>Evento</span>
+
+        <button class="nav-item" data-page="event">
+            <span class="nav-icon">✦</span>
+            Evento del mes
         </button>
-        <button class="sidebar-item" data-section="profile" aria-label="Perfil">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-          <span>Perfil</span>
+
+        <button class="nav-item" data-page="profile">
+            <span class="nav-icon">○</span>
+            Perfil
         </button>
-        <button class="sidebar-item" data-section="settings" aria-label="Configuración">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
-          <span>Configuración</span>
+
+        <button class="nav-item" data-page="settings">
+            <span class="nav-icon">⚙</span>
+            Configuración
         </button>
-      </nav>
-    </aside>
 
-    <!-- CONTENT AREA -->
-    <main class="app-content">
-      
-      <!-- HOME SECTION -->
-      <section id="homeSection" class="content-section active">
-        <!-- Modern Header -->
-        <div class="home-header">
-          <div class="home-greeting">
-            <h1>Hola, <span id="userName">Usuario</span> 💗</h1>
-            <p class="home-subtitle">Bienvenido a vuestro espacio especial ✨</p>
-          </div>
-          <div class="home-actions">
-            <button class="header-action-btn" aria-label="Buscar">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/>
-                <path d="m21 21-4.35-4.35"/>
-              </svg>
-            </button>
-            <button class="header-action-btn" aria-label="Notificaciones">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Main Grid Layout -->
-        <div class="home-grid">
-          
-          <!-- Left Column -->
-          <div class="home-main-column">
-            
-            <!-- Time Together Card (Main) -->
-            <div class="card counter-card main-counter-card">
-              <h3>Tiempo juntos 💗</h3>
-              <div class="counter-display">
-                <div class="counter-item">
-                  <span id="counterYears" class="counter-value">0</span>
-                  <span class="counter-label">Años</span>
-                </div>
-                <div class="counter-item">
-                  <span id="counterMonths" class="counter-value">0</span>
-                  <span class="counter-label">Meses</span>
-                </div>
-                <div class="counter-item">
-                  <span id="counterDays" class="counter-value">0</span>
-                  <span class="counter-label">Días</span>
-                </div>
-                <div class="counter-item">
-                  <span id="counterHours" class="counter-value">0</span>
-                  <span class="counter-label">Horas</span>
-                </div>
-                <div class="counter-item">
-                  <span id="counterMinutes" class="counter-value">0</span>
-                  <span class="counter-label">Min</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Couple Info Card -->
-            <div class="card couple-info-card">
-              <div class="couple-photos">
-                <img id="user1Photo" src="" alt="Usuario 1" class="couple-photo">
-                <img id="user2Photo" src="" alt="Usuario 2" class="couple-photo">
-              </div>
-              <div class="couple-names">
-                <h2 id="coupleNames">Usuario 1 & Usuario 2</h2>
-                <p id="togetherSince">Juntos desde --</p>
-              </div>
-            </div>
-
-            <!-- Quick Access Grid -->
-            <div class="quick-access-grid">
-              <div class="quick-access-card" data-section="calendar">
-                <div class="quick-icon">📅</div>
-                <span>Calendario</span>
-              </div>
-              <div class="quick-access-card" data-section="album">
-                <div class="quick-icon">�</div>
-                <span>Álbum</span>
-              </div>
-              <div class="quick-access-card" data-section="notes">
-                <div class="quick-icon">📝</div>
-                <span>Notas</span>
-              </div>
-              <div class="quick-access-card" data-section="thoughts">
-                <div class="quick-icon">💭</div>
-                <span>Pensamientos</span>
-              </div>
-              <div class="quick-access-card" data-section="poems">
-                <div class="quick-icon">�</div>
-                <span>Poemas</span>
-              </div>
-              <div class="quick-access-card" data-section="letters">
-                <div class="quick-icon">💌</div>
-                <span>Cartas</span>
-              </div>
-              <div class="quick-access-card" data-section="location">
-                <div class="quick-icon">📍</div>
-                <span>Ubicación</span>
-              </div>
-              <div class="quick-access-card" data-section="event">
-                <div class="quick-icon">🎁</div>
-                <span>Eventos</span>
-              </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="card recent-activity-card">
-              <h3>Actividad reciente</h3>
-              <div id="recentActivityList" class="activity-list">
-                <p class="empty-state">No hay actividad reciente</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right Column -->
-          <div class="home-side-column">
-            
-            <!-- Monthly Event Card -->
-            <div class="card monthly-event-card" id="monthlyEventCard">
-              <div class="card-header">
-                <h3>🎁 Próximo evento</h3>
-                <span class="event-badge" id="eventBadge">Nuevo</span>
-              </div>
-              <div class="event-content">
-                <h4 id="eventTitle">Cargando evento...</h4>
-                <p id="eventDescription">--</p>
-                <button id="openEventBtn" class="btn btn-primary btn-full">Ver detalles</button>
-              </div>
-            </div>
-
-            <!-- Daily Quote Card -->
-            <div class="card daily-quote-card">
-              <div class="quote-icon">💕</div>
-              <p class="quote-text">"El amor no se mira, se siente, y aún más cuando ella está junto a ti."</p>
-              <p class="quote-author">- Pablo Neruda</p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <!-- CALENDAR SECTION -->
-      <section id="calendarSection" class="content-section">
-        <div class="calendar-container">
-          <!-- Calendar Header -->
-          <div class="calendar-header">
-            <div class="calendar-title">
-              <h1>📅 Calendario</h1>
-              <p>Organiza tus momentos especiales</p>
-            </div>
-            <button id="calendarAddEvent" class="btn btn-primary">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-              Agregar recuerdo
-            </button>
-          </div>
-          
-          <!-- Calendar Navigation -->
-          <div class="calendar-navigation">
-            <button id="calendarPrevMonth" class="calendar-nav-btn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="15 18 9 12 15 6"/>
-              </svg>
-            </button>
-            <h2 id="calendarMonthTitle">Enero 2024</h2>
-            <button id="calendarNextMonth" class="calendar-nav-btn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6"/>
-              </svg>
-            </button>
-          </div>
-          
-          <button id="calendarToday" class="calendar-today-btn">Hoy</button>
-          
-          <!-- Calendar Grid -->
-          <div class="calendar-wrapper">
-            <div class="calendar-weekdays">
-              <div class="calendar-weekday">Dom</div>
-              <div class="calendar-weekday">Lun</div>
-              <div class="calendar-weekday">Mar</div>
-              <div class="calendar-weekday">Mié</div>
-              <div class="calendar-weekday">Jue</div>
-              <div class="calendar-weekday">Vie</div>
-              <div class="calendar-weekday">Sáb</div>
-            </div>
-            <div id="calendarGrid" class="calendar-grid"></div>
-          </div>
-          
-          <!-- Events Panel -->
-          <div id="calendarEventsPanel" class="calendar-events-panel hidden">
-            <div class="calendar-events-header">
-              <h3 id="calendarEventsTitle">Recuerdos del día</h3>
-              <button class="calendar-close-panel" onclick="document.getElementById('calendarEventsPanel').classList.add('hidden')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-              </button>
-            </div>
-            <div id="calendarEventsList" class="calendar-events-list"></div>
-          </div>
-        </div>
-      </section>
-      
-      <!-- Calendar Event Modal -->
-      <div id="calendarEventModal" class="modal hidden">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Agregar recuerdo</h2>
-            <button class="modal-close" onclick="calendarCloseEventModal()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-          <form id="calendarEventForm" class="modal-body">
-            <div class="form-group">
-              <label for="eventTitle">Título *</label>
-              <input type="text" id="eventTitle" required placeholder="Ej: Cena romántica">
-            </div>
-            <div class="form-group">
-              <label for="eventDate">Fecha *</label>
-              <input type="date" id="eventDate" required>
-            </div>
-            <div class="form-group">
-              <label for="eventDescription">Descripción</label>
-              <textarea id="eventDescription" rows="3" placeholder="Detalles del evento..."></textarea>
-            </div>
-            <div class="form-group">
-              <label for="eventColor">Color</label>
-              <div class="color-picker">
-                <input type="radio" name="eventColor" value="#ff6b6b" id="colorRed" checked>
-                <label for="colorRed" class="color-option" style="background: #ff6b6b"></label>
-                
-                <input type="radio" name="eventColor" value="#4ecdc4" id="colorTeal">
-                <label for="colorTeal" class="color-option" style="background: #4ecdc4"></label>
-                
-                <input type="radio" name="eventColor" value="#45b7d1" id="colorBlue">
-                <label for="colorBlue" class="color-option" style="background: #45b7d1"></label>
-                
-                <input type="radio" name="eventColor" value="#f9ca24" id="colorYellow">
-                <label for="colorYellow" class="color-option" style="background: #f9ca24"></label>
-                
-                <input type="radio" name="eventColor" value="#a55eea" id="colorPurple">
-                <label for="colorPurple" class="color-option" style="background: #a55eea"></label>
-              </div>
-            </div>
-            <div class="modal-actions">
-              <button type="button" class="btn btn-secondary" onclick="calendarCloseEventModal()">Cancelar</button>
-              <button type="submit" class="btn btn-primary">Guardar</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- EVENT SECTION (Main Feature) -->
-      <section id="eventSection" class="content-section">
-        <div class="section-header">
-          <h1>🎁 Evento del mes</h1>
-        </div>
-        
-        <!-- Current Event -->
-        <div class="card event-main-card">
-          <div class="event-header">
-            <span class="event-month" id="currentEventMonth">Enero</span>
-            <span class="event-status" id="currentEventStatus">Pendiente</span>
-          </div>
-          <h2 id="currentEventTitle">Cargando...</h2>
-          <p id="currentEventDescription">--</p>
-          <div class="event-type-badge" id="currentEventType">--</div>
-          
-          <div id="eventActionArea" class="event-action-area">
-            <button id="startEventBtn" class="btn btn-primary btn-large">Comenzar evento</button>
-          </div>
-        </div>
-        
-        <!-- Event History -->
-        <div class="card event-history-card">
-          <h3>Historial de eventos</h3>
-          <div id="eventHistoryList" class="event-history-list">
-            <p class="empty-state">No hay eventos completados aún</p>
-          </div>
-        </div>
-        
-        <!-- Badges -->
-        <div class="card badges-card">
-          <h3>Insignias</h3>
-          <div id="badgesList" class="badges-list">
-            <p class="empty-state">Completa eventos para ganar insignias</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- PROFILE SECTION -->
-      <section id="profileSection" class="content-section">
-        <div class="section-header">
-          <h1>❤️ Perfil</h1>
-        </div>
-        
-        <!-- User Profile -->
-        <div class="card profile-card">
-          <div class="profile-header">
-            <img id="profilePhoto" src="" alt="Foto de perfil" class="profile-photo">
-            <div class="profile-info">
-              <h2 id="profileName">Nombre</h2>
-              <p id="profileEmail">email@ejemplo.com</p>
-            </div>
-          </div>
-          <div class="profile-details">
-            <div class="detail-item">
-              <span class="detail-label">Código de pareja:</span>
-              <span id="profileCoupleCode" class="detail-value">--</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Miembro desde:</span>
-              <span id="profileMemberSince" class="detail-value">--</span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Couple Profile -->
-        <div class="card couple-profile-card">
-          <h3>Información de la pareja</h3>
-          <div class="couple-details">
-            <div class="detail-item">
-              <span class="detail-label">Aniversario:</span>
-              <span id="profileAnniversary" class="detail-value">--</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Primera cita:</span>
-              <span id="profileFirstDate" class="detail-value">--</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Canción favorita:</span>
-              <span id="profileSong" class="detail-value">--</span>
-            </div>
-          </div>
-          <button id="editCoupleInfoBtn" class="btn btn-secondary btn-full">Editar información</button>
-        </div>
-        
-        <!-- Statistics -->
-        <div class="card stats-card">
-          <h3>Estadísticas</h3>
-          <div class="stats-grid">
-            <div class="stat-item">
-              <span id="statEvents" class="stat-value">0</span>
-              <span class="stat-label">Eventos</span>
-            </div>
-            <div class="stat-item">
-              <span id="statPhotos" class="stat-value">0</span>
-              <span class="stat-label">Fotos</span>
-            </div>
-            <div class="stat-item">
-              <span id="statNotes" class="stat-value">0</span>
-              <span class="stat-label">Notas</span>
-            </div>
-            <div class="stat-item">
-              <span id="statThoughts" class="stat-value">0</span>
-              <span class="stat-label">Pensamientos</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- SETTINGS SECTION -->
-      <section id="settingsSection" class="content-section">
-        <div class="section-header">
-          <h1>⚙ Configuración</h1>
-        </div>
-        
-        <!-- Appearance -->
-        <div class="card settings-card">
-          <h3>Apariencia</h3>
-          <div class="setting-item">
-            <span>Modo oscuro</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="darkModeToggle">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="setting-item">
-            <span>Tema de color</span>
-            <select id="themeSelect" class="input">
-              <option value="pink">Rosa</option>
-              <option value="blue">Azul</option>
-              <option value="purple">Púrpura</option>
-              <option value="green">Verde</option>
-            </select>
-          </div>
-        </div>
-        
-        <!-- Notifications -->
-        <div class="card settings-card">
-          <h3>Notificaciones</h3>
-          <div class="setting-item">
-            <span>Eventos del mes</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="eventNotificationsToggle" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="setting-item">
-            <span>Recordatorios</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="reminderNotificationsToggle" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-        
-        <!-- Privacy -->
-        <div class="card settings-card">
-          <h3>Privacidad</h3>
-          <div class="setting-item">
-            <span>Compartir ubicación</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="locationToggle">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-        
-        <!-- Account -->
-        <div class="card settings-card danger-zone">
-          <h3>Cuenta</h3>
-          <button id="unlinkPartnerBtn" class="btn btn-secondary btn-full">Desvincular pareja</button>
-          <button id="signOutBtn" class="btn btn-danger btn-full">Cerrar sesión</button>
-        </div>
-      </section>
-
-      <!-- ALBUM SECTION -->
-      <section id="albumSection" class="content-section">
-        <div class="section-header">
-          <h1>📸 Álbum</h1>
-          <button id="addPhotoBtn" class="btn btn-primary btn-small">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Añadir foto
-          </button>
-        </div>
-        
-        <div id="albumGrid" class="album-grid">
-          <p class="empty-state">No hay fotos aún. ¡Añade la primera!</p>
-        </div>
-      </section>
-
-      <!-- NOTES SECTION -->
-      <section id="notesSection" class="content-section">
-        <div class="section-header">
-          <h1>📝 Notas</h1>
-          <button id="addNoteBtn" class="btn btn-primary btn-small">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Nueva nota
-          </button>
-        </div>
-        
-        <div id="notesList" class="notes-list">
-          <p class="empty-state">No hay notas aún</p>
-        </div>
-      </section>
-
-      <!-- THOUGHTS SECTION -->
-      <section id="thoughtsSection" class="content-section">
-        <div class="section-header">
-          <h1>💭 Pensamientos</h1>
-        </div>
-        
-        <div class="card thought-input-card">
-          <textarea id="thoughtInput" class="input textarea" placeholder="¿Qué estás pensando?" rows="3"></textarea>
-          <button id="postThoughtBtn" class="btn btn-primary btn-full">Publicar</button>
-        </div>
-        
-        <div id="thoughtsList" class="thoughts-list">
-          <p class="empty-state">No hay pensamientos aún</p>
-        </div>
-      </section>
-
-      <!-- POEMS SECTION -->
-      <section id="poemsSection" class="content-section">
-        <div class="section-header">
-          <h1>📜 Poemas</h1>
-          <button id="addPoemBtn" class="btn btn-primary btn-small">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Nuevo poema
-          </button>
-        </div>
-        
-        <div id="poemsList" class="poems-list">
-          <p class="empty-state">No hay poemas aún</p>
-        </div>
-      </section>
-
-      <!-- LETTERS SECTION -->
-      <section id="lettersSection" class="content-section">
-        <div class="section-header">
-          <h1>✉️ Cartas</h1>
-          <button id="addLetterBtn" class="btn btn-primary btn-small">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Nueva carta
-          </button>
-        </div>
-        
-        <div id="lettersList" class="letters-list">
-          <p class="empty-state">No hay cartas aún</p>
-        </div>
-      </section>
-
-      <!-- LOCATION SECTION -->
-      <section id="locationSection" class="content-section">
-        <div class="section-header">
-          <h1>📍 Mapa de nuestra vida</h1>
-          <button id="refreshLocationBtn" class="btn btn-secondary btn-small">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 4 23 10 17 10"/>
-              <polyline points="1 20 1 14 7 14"/>
-              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-            </svg>
-            Actualizar
-          </button>
-        </div>
-        
-        <!-- Distance Indicator -->
-        <div class="card distance-card">
-          <div class="distance-content">
-            <div class="distance-icon">❤️</div>
-            <div class="distance-info">
-              <p id="distanceIndicator" class="distance-text">Calculando distancia...</p>
-              <p id="locationStatus" class="location-status status-warning">Esperando ubicación...</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Map Card -->
-        <div class="card location-card">
-          <div id="locationMap" class="location-map"></div>
-        </div>
-        
-        <!-- Location Info -->
-        <div class="card location-info-card">
-          <div class="location-info">
-            <div class="location-item">
-              <span class="location-label">🩷 Tu ubicación:</span>
-              <span id="myLocation" class="location-value">--</span>
-            </div>
-            <div class="location-item">
-              <span class="location-label">💜 Ubicación de tu pareja:</span>
-              <span id="partnerLocation" class="location-value">--</span>
-            </div>
-            <div class="location-item">
-              <span class="location-label">🕐 Última actualización:</span>
-              <span id="locationLastUpdate" class="location-value">--</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- BOTTOM NAVIGATION (MOBILE) -->
-    <nav class="bottom-nav">
-      <button class="nav-item active" data-section="home" aria-label="Inicio">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
-        </svg>
-        <span>Inicio</span>
-      </button>
-      <button class="nav-item" data-section="calendar" aria-label="Calendario">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-          <line x1="16" y1="2" x2="16" y2="6"/>
-          <line x1="8" y1="2" x2="8" y2="6"/>
-          <line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-        <span>Calendario</span>
-      </button>
-      <button class="nav-item" data-section="album" aria-label="Álbum">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-          <circle cx="8.5" cy="8.5" r="1.5"/>
-          <polyline points="21 15 16 10 5 21"/>
-        </svg>
-        <span>Álbum</span>
-      </button>
-      <button class="nav-item" data-section="notes" aria-label="Notas">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-          <line x1="16" y1="13" x2="8" y2="13"/>
-          <line x1="16" y1="17" x2="8" y2="17"/>
-          <polyline points="10 9 9 9 8 9"/>
-        </svg>
-        <span>Notas</span>
-      </button>
-      <button class="nav-item" data-section="thoughts" aria-label="Pensamientos">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-        </svg>
-        <span>Pensamientos</span>
-      </button>
-      <button class="nav-item" data-section="poems" aria-label="Poemas">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-        </svg>
-        <span>Poemas</span>
-      </button>
-      <button class="nav-item" data-section="letters" aria-label="Cartas">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-          <polyline points="22,6 12,13 2,6"/>
-        </svg>
-        <span>Cartas</span>
-      </button>
-      <button class="nav-item" data-section="location" aria-label="Ubicación">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-          <circle cx="12" cy="10" r="3"/>
-        </svg>
-        <span>Ubicación</span>
-      </button>
-      <button class="nav-item" data-section="event" aria-label="Evento">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-        <span>Evento</span>
-      </button>
-      <button class="nav-item" data-section="profile" aria-label="Perfil">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-        <span>Perfil</span>
-      </button>
-      <button class="nav-item" data-section="settings" aria-label="Configuración">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-        <span>Config</span>
-      </button>
     </nav>
-  </div>
 
-  <!-- ============================================
-       MODALS
-       ============================================ -->
-  
-  <!-- Event Modal -->
-  <div id="eventModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalEventTitle">Evento</h2>
-        <button class="modal-close" id="closeEventModal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body" id="modalEventBody">
-        <!-- Dynamic content -->
-      </div>
+    <div class="sidebar-bottom">
+
+        <div class="connection-card">
+            Pareja conectada
+            <span id="connectionStatus">
+                Sin pareja conectada
+            </span>
+        </div>
+
     </div>
-  </div>
 
-  <!-- Add Event Modal -->
-  <div id="addEventModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Añadir evento</h2>
-        <button class="modal-close" id="closeAddEventModal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
+</aside>
+
+
+<!-- =========================================
+     MAIN
+========================================= -->
+
+<main class="main">
+
+<header class="topbar">
+
+    <div style="display:flex;align-items:center;">
+
+        <button class="mobile-menu" id="mobileMenu">
+            ☰
         </button>
-      </div>
-      <div class="modal-body">
-        <form id="addEventForm">
-          <div class="form-group">
-            <label>Título</label>
-            <input type="text" id="eventTitleInput" class="input" required>
-          </div>
-          <div class="form-group">
-            <label>Descripción</label>
-            <textarea id="eventDescInput" class="input textarea" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Fecha</label>
-            <input type="date" id="eventDateInput" class="input" required>
-          </div>
-          <div class="form-group">
-            <label>Tipo</label>
-            <select id="eventTypeInput" class="input">
-              <option value="birthday">Cumpleaños</option>
-              <option value="anniversary">Aniversario</option>
-              <option value="date">Cita</option>
-              <option value="trip">Viaje</option>
-              <option value="goal">Meta</option>
-              <option value="reminder">Recordatorio</option>
-              <option value="custom">Personalizado</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Color</label>
-            <div class="color-picker">
-              <input type="radio" name="eventColor" value="#ff6b9d" checked>
-              <input type="radio" name="eventColor" value="#4ecdc4">
-              <input type="radio" name="eventColor" value="#45b7d1">
-              <input type="radio" name="eventColor" value="#f7b731">
-              <input type="radio" name="eventColor" value="#a55eea">
+
+        <div class="page-title">
+            <h1 id="pageTitle">Inicio</h1>
+            <p id="pageSubtitle">Tu espacio compartido.</p>
+        </div>
+
+    </div>
+
+    <div class="top-actions">
+
+        <button class="icon-button">
+            ♡
+        </button>
+
+        <button class="icon-button">
+            ◌
+        </button>
+
+        <button class="user-button">
+            <div class="avatar" id="headerAvatar">A</div>
+        </button>
+
+    </div>
+
+</header>
+
+
+<section class="content">
+
+<!-- =========================================
+     DASHBOARD
+========================================= -->
+
+<div class="page" id="page-dashboard">
+
+    <div class="dashboard-header">
+        <h2>Inicio</h2>
+        <p>Tu espacio compartido.</p>
+    </div>
+
+    <div class="relationship">
+
+        <div>
+
+            <div class="relationship-label">
+                Tiempo juntos
             </div>
-          </div>
-          <button type="submit" class="btn btn-primary btn-full">Guardar evento</button>
-        </form>
-      </div>
-    </div>
-  </div>
 
-  <!-- Add Photo Modal -->
-  <div id="addPhotoModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Añadir foto</h2>
-        <button class="modal-close" id="closeAddPhotoModal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="addPhotoForm">
-          <div class="form-group">
-            <label>Seleccionar foto</label>
-            <input type="file" id="photoFileInput" class="input" accept="image/*" required>
-          </div>
-          <div class="form-group">
-            <label>Descripción</label>
-            <textarea id="photoDescInput" class="input textarea" rows="3" placeholder="Añade una descripción..."></textarea>
-          </div>
-          <div class="form-group">
-            <label>Ubicación (opcional)</label>
-            <input type="text" id="photoLocationInput" class="input" placeholder="¿Dónde fue tomada?">
-          </div>
-          <button type="submit" class="btn btn-primary btn-full">Subir foto</button>
-        </form>
-      </div>
-    </div>
-  </div>
+            <h2 id="coupleNames">
+                —
+            </h2>
 
-  <!-- Add Note Modal -->
-  <div id="addNoteModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Nueva nota</h2>
-        <button class="modal-close" id="closeAddNoteModal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="addNoteForm">
-          <div class="form-group">
-            <label>Contenido</label>
-            <textarea id="noteContentInput" class="input textarea" rows="5" required placeholder="Escribe tu nota..."></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary btn-full">Guardar nota</button>
-        </form>
-      </div>
-    </div>
-  </div>
+            <div class="relationship-date" id="relationshipDate">
+                —
+            </div>
 
-  <!-- Add Poem Modal -->
-  <div id="addPoemModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Nuevo poema</h2>
-        <button class="modal-close" id="closeAddPoemModal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="addPoemForm">
-          <div class="form-group">
-            <label>Título</label>
-            <input type="text" id="poemTitleInput" class="input" required>
-          </div>
-          <div class="form-group">
-            <label>Contenido</label>
-            <textarea id="poemContentInput" class="input textarea" rows="8" required placeholder="Escribe tu poema..."></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary btn-full">Guardar poema</button>
-        </form>
-      </div>
-    </div>
-  </div>
+            <div class="counter">
 
-  <!-- Add Letter Modal -->
-  <div id="addLetterModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Nueva carta</h2>
-        <button class="modal-close" id="closeAddLetterModal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="addLetterForm">
-          <div class="form-group">
-            <label>Para</label>
-            <select id="letterRecipientInput" class="input">
-              <option value="partner">Mi pareja</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Fecha de apertura</label>
-            <input type="date" id="letterOpenDateInput" class="input" required>
-          </div>
-          <div class="form-group">
-            <label>Contenido</label>
-            <textarea id="letterContentInput" class="input textarea" rows="8" required placeholder="Escribe tu carta..."></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary btn-full">Guardar carta</button>
-        </form>
-      </div>
-    </div>
-  </div>
+                <div class="counter-item">
+                    <strong id="years">0</strong>
+                    <span>Años</span>
+                </div>
 
-  <!-- Edit Couple Info Modal -->
-  <div id="editCoupleModal" class="modal hidden">
-    <div class="modal-content">
+                <div class="counter-item">
+                    <strong id="months">0</strong>
+                    <span>Meses</span>
+                </div>
+
+                <div class="counter-item">
+                    <strong id="days">0</strong>
+                    <span>Días</span>
+                </div>
+
+                <div class="counter-item">
+                    <strong id="hours">00</strong>
+                    <span>Horas</span>
+                </div>
+
+                <div class="counter-item">
+                    <strong id="minutes">00</strong>
+                    <span>Minutos</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="couple-placeholder">
+            ♡
+        </div>
+
+    </div>
+
+
+    <div class="grid" style="margin-top:18px;">
+
+        <div class="card col-5">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Cita romántica
+                </h3>
+            </div>
+
+            <div class="empty">
+                <div>
+                    <div class="empty-icon">♡</div>
+                    <p>
+                        No hay una cita para hoy.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card col-7">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Evento del mes
+                </h3>
+            </div>
+
+            <div class="empty">
+                <div>
+                    <div class="empty-icon">✦</div>
+                    <p>
+                        No hay un evento activo.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card col-7">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Actividad reciente
+                </h3>
+            </div>
+
+            <div class="empty">
+                <div>
+                    <div class="empty-icon">◌</div>
+                    <p>
+                        Todavía no hay actividad.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card col-5">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Próximo evento
+                </h3>
+            </div>
+
+            <div class="empty">
+                <div>
+                    <div class="empty-icon">□</div>
+                    <p>
+                        No hay eventos próximos.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     CALENDAR
+========================================= -->
+
+<div class="page" id="page-calendar" hidden>
+
+    <div class="card">
+
+        <div class="calendar-toolbar">
+
+            <div>
+                <div class="calendar-month">
+                    <span id="calendarMonth">
+                        —
+                    </span>
+                </div>
+            </div>
+
+            <div class="calendar-actions">
+
+                <button class="secondary-button" id="calendarPrevMonth">
+                    ‹
+                </button>
+
+                <button class="secondary-button" id="calendarToday">
+                    Hoy
+                </button>
+
+                <button class="secondary-button" id="calendarNextMonth">
+                    ›
+                </button>
+
+                <button
+                    class="primary-button"
+                    id="calendarAddEvent">
+                    + Recuerdo
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="calendar-container">
+
+            <div class="calendar">
+
+                <div class="weekday">Dom</div>
+                <div class="weekday">Lun</div>
+                <div class="weekday">Mar</div>
+                <div class="weekday">Mié</div>
+                <div class="weekday">Jue</div>
+                <div class="weekday">Vie</div>
+                <div class="weekday">Sáb</div>
+
+                <div id="calendarGrid">
+                    <!-- Calendar days will be generated by JS -->
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     ALBUM
+========================================= -->
+
+<div class="page" id="page-album" hidden>
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h3 class="card-title">
+                    Álbum
+                </h3>
+
+                <p class="muted" style="font-size:11px;">
+                    Tus recuerdos compartidos.
+                </p>
+            </div>
+
+            <button
+                class="primary-button"
+                id="addPhotoBtn">
+                + Subir fotos
+            </button>
+
+            <input
+                id="photoInput"
+                type="file"
+                accept="image/*"
+                multiple
+                hidden>
+
+        </div>
+
+        <div class="gallery" id="albumGrid">
+
+            <div class="empty gallery-empty">
+                <div>
+                    <div class="empty-icon">▧</div>
+                    <p>
+                        El álbum está vacío.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     NOTES
+========================================= -->
+
+<div class="page" id="page-notes" hidden>
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h3 class="card-title">
+                    Notas
+                </h3>
+            </div>
+
+            <button
+                class="primary-button"
+                id="addNoteBtn">
+                + Nueva nota
+            </button>
+
+        </div>
+
+        <div class="empty">
+            <div>
+                <div class="empty-icon">▤</div>
+                <p>
+                    No hay notas todavía.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     THOUGHTS
+========================================= -->
+
+<div class="page" id="page-thoughts" hidden>
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h3 class="card-title">
+                    Pensamientos
+                </h3>
+            </div>
+
+            <button
+                class="primary-button"
+                id="addThoughtBtn">
+                + Escribir
+            </button>
+
+        </div>
+
+        <div class="empty">
+            <div>
+                <div class="empty-icon">♡</div>
+                <p>
+                    Todavía no hay pensamientos.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     POEMS
+========================================= -->
+
+<div class="page" id="page-poems" hidden>
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h3 class="card-title">
+                    Poemas
+                </h3>
+            </div>
+
+            <button
+                class="primary-button"
+                id="addPoemBtn">
+                + Nuevo poema
+            </button>
+
+        </div>
+
+        <div class="empty">
+            <div>
+                <div class="empty-icon">≋</div>
+                <p>
+                    No hay poemas todavía.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     LETTERS
+========================================= -->
+
+<div class="page" id="page-letters" hidden>
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h3 class="card-title">
+                    Cartas
+                </h3>
+            </div>
+
+            <button
+                class="primary-button"
+                id="addLetterBtn">
+                + Escribir carta
+            </button>
+
+        </div>
+
+        <div class="empty">
+            <div>
+                <div class="empty-icon">✉</div>
+                <p>
+                    No hay cartas todavía.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     LOCATION
+========================================= -->
+
+<div class="page" id="page-location" hidden>
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h3 class="card-title">
+                    Ubicación
+                </h3>
+
+                <p class="muted" style="font-size:11px;">
+                    Ubicación compartida.
+                </p>
+            </div>
+
+            <button class="primary-button" id="updateLocationBtn">
+                Actualizar
+            </button>
+
+        </div>
+
+        <div class="map">
+
+            <div class="map-marker marker-user"></div>
+
+            <div class="map-marker marker-partner"></div>
+
+            <div class="map-info">
+
+                <span class="muted">
+                    Distancia
+                </span>
+
+                <strong id="distance">
+                    —
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     EVENT
+========================================= -->
+
+<div class="page" id="page-event" hidden>
+
+    <div class="grid">
+
+        <div class="card col-8">
+
+            <div class="event-main">
+
+                <div class="event-icon">
+                    ✦
+                </div>
+
+                <h2 id="monthlyEventTitle">
+                    —
+                </h2>
+
+                <p id="monthlyEventDescription">
+                    No hay un evento configurado.
+                </p>
+
+                <button class="primary-button" id="startEventBtn">
+                    Comenzar evento
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="card col-4">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Historial
+                </h3>
+            </div>
+
+            <div class="empty">
+                <div>
+                    <div class="empty-icon">□</div>
+                    <p>
+                        No hay eventos completados.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="card col-12">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Insignias
+                </h3>
+            </div>
+
+            <div class="empty">
+                <div>
+                    <div class="empty-icon">✦</div>
+                    <p>
+                        Las insignias aparecerán conforme completen eventos.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     PROFILE
+========================================= -->
+
+<div class="page" id="page-profile" hidden>
+
+    <div class="card">
+
+        <div class="profile-header">
+
+            <div class="profile-user">
+
+                <div class="avatar" id="profileAvatar">
+                    A
+                </div>
+
+                <div>
+                    <h2 id="profileName">
+                        —
+                    </h2>
+
+                    <p id="profileEmail">
+                        —
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="grid">
+
+            <div class="card col-7">
+
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Información de la pareja
+                    </h3>
+
+                    <button class="secondary-button" id="editCoupleInfoBtn">
+                        Editar
+                    </button>
+                </div>
+
+                <div class="list">
+
+                    <div class="list-item">
+                        <h4>Aniversario</h4>
+                        <p id="anniversary">—</p>
+                    </div>
+
+                    <div class="list-item">
+                        <h4>Primera cita</h4>
+                        <p id="firstDate">—</p>
+                    </div>
+
+                    <div class="list-item">
+                        <h4>Canción favorita</h4>
+                        <p id="favoriteSong">—</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card col-5">
+
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Estadísticas
+                    </h3>
+                </div>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <strong id="photoCount">0</strong>
+                        <span>Fotos</span>
+                    </div>
+
+                    <div class="stat">
+                        <strong id="noteCount">0</strong>
+                        <span>Notas</span>
+                    </div>
+
+                    <div class="stat">
+                        <strong id="thoughtCount">0</strong>
+                        <span>Pensamientos</span>
+                    </div>
+
+                    <div class="stat">
+                        <strong id="eventCount">0</strong>
+                        <span>Eventos</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     SETTINGS
+========================================= -->
+
+<div class="page" id="page-settings" hidden>
+
+    <div class="grid">
+
+        <div class="card col-7">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Configuración
+                </h3>
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+                    <strong>Modo oscuro</strong>
+                    <span>Cambiar apariencia.</span>
+                </div>
+
+                <button class="switch" id="darkModeSwitch" data-switch></button>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+                    <strong>Notificaciones de eventos</strong>
+                    <span>Recibir avisos de eventos del mes.</span>
+                </div>
+
+                <button class="switch active" id="eventNotificationsSwitch" data-switch></button>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+                    <strong>Recordatorios</strong>
+                    <span>Recibir recordatorios.</span>
+                </div>
+
+                <button class="switch active" id="reminderSwitch" data-switch></button>
+
+            </div>
+
+
+            <div class="setting">
+
+                <div>
+                    <strong>Compartir ubicación</strong>
+                    <span>Permitir compartir tu ubicación.</span>
+                </div>
+
+                <button class="switch" id="locationSwitch" data-switch></button>
+
+            </div>
+
+        </div>
+
+
+        <div class="card col-5">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Tema
+                </h3>
+            </div>
+
+            <div class="themes">
+
+                <button class="theme theme-brown active"></button>
+                <button class="theme theme-rose"></button>
+                <button class="theme theme-purple"></button>
+                <button class="theme theme-green"></button>
+
+            </div>
+
+
+            <div style="margin-top:30px;">
+
+                <button
+                    class="secondary-button"
+                    id="unlinkPartnerBtn"
+                    style="width:100%;margin-bottom:9px;">
+                    Desvincular pareja
+                </button>
+
+                <button
+                    class="secondary-button"
+                    id="signOutBtn"
+                    style="width:100%;color:var(--danger);">
+                    Cerrar sesión
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+  <!-- Calendar Event Modal -->
+  <div id="calendarEventModal" class="modal-overlay">
+    <div class="modal">
       <div class="modal-header">
-        <h2>Editar información</h2>
-        <button class="modal-close" id="closeEditCoupleModal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+        <h2>Agregar recuerdo</h2>
+        <button class="close" id="closeEventModal">×</button>
       </div>
-      <div class="modal-body">
-        <form id="editCoupleForm">
-          <div class="form-group">
-            <label>Fecha de aniversario</label>
-            <input type="date" id="anniversaryInput" class="input">
+      <form id="calendarEventForm">
+        <div class="form-group">
+          <label>Título *</label>
+          <input type="text" id="eventTitle" required placeholder="Ej: Cena romántica">
+        </div>
+        <div class="form-group">
+          <label>Fecha *</label>
+          <input type="date" id="eventDate" required>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="eventDescription" rows="3" placeholder="Detalles del evento..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Color</label>
+          <div class="color-picker">
+            <input type="radio" name="eventColor" value="#ff6b6b" id="colorRed" checked>
+            <label for="colorRed" class="color-option" style="background: #ff6b6b"></label>
+            
+            <input type="radio" name="eventColor" value="#4ecdc4" id="colorTeal">
+            <label for="colorTeal" class="color-option" style="background: #4ecdc4"></label>
+            
+            <input type="radio" name="eventColor" value="#45b7d1" id="colorBlue">
+            <label for="colorBlue" class="color-option" style="background: #45b7d1"></label>
+            
+            <input type="radio" name="eventColor" value="#f9ca24" id="colorYellow">
+            <label for="colorYellow" class="color-option" style="background: #f9ca24"></label>
+            
+            <input type="radio" name="eventColor" value="#a55eea" id="colorPurple">
+            <label for="colorPurple" class="color-option" style="background: #a55eea"></label>
           </div>
-          <div class="form-group">
-            <label>Primera cita</label>
-            <input type="date" id="firstDateInput" class="input">
-          </div>
-          <div class="form-group">
-            <label>Primer beso</label>
-            <input type="date" id="firstKissInput" class="input">
-          </div>
-          <div class="form-group">
-            <label>Canción favorita</label>
-            <input type="text" id="songInput" class="input" placeholder="Nombre de la canción">
-          </div>
-          <button type="submit" class="btn btn-primary btn-full">Guardar cambios</button>
-        </form>
-      </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="secondary-button" id="cancelEventModal">Cancelar</button>
+          <button type="submit" class="primary-button">Guardar</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1124,9 +1084,8 @@
 
   <!-- Scripts -->
   <script src="firebase.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="location.js?v=2"></script>
-  <script src="calendar.js"></script>
   <script src="app.js"></script>
+  <script src="calendar.js"></script>
+  <script src="location.js"></script>
 </body>
 </html>
