@@ -305,9 +305,9 @@ function calendarShowDayEvents(dateStr) {
     eventsList.innerHTML = `
       <div class="calendar-empty-state">
         <span class="calendar-empty-icon">📅</span>
-        <p>No hay eventos este día</p>
+        <p>No hay recuerdos este día</p>
         <button class="btn btn-primary btn-small" onclick="calendarOpenEventModal('${dateStr}')">
-          Añadir evento
+          Agregar recuerdo
         </button>
       </div>
     `;
@@ -317,7 +317,7 @@ function calendarShowDayEvents(dateStr) {
 }
 
 // ============================================
-// MODAL PARA AÑADIR EVENTO
+// MODAL PARA AGREGAR RECUERDO
 // ============================================
 function calendarOpenEventModal(dateStr = null) {
   const modal = document.getElementById('calendarEventModal');
