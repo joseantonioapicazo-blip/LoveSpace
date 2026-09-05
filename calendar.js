@@ -13,24 +13,24 @@ const CalendarState = {
 // INICIALIZACIÓN
 // ============================================
 function initializeCalendar() {
-  if (CalendarState.isInitialized) {
-    console.log('⚠ Calendario ya inicializado');
-    return;
-  }
-  
   console.log('📅 Inicializando calendario...');
+  
+  // Resetear estado para permitir re-inicialización
+  CalendarState.isInitialized = false;
   
   // Configurar listeners
   setupCalendarListeners();
   
-  // Renderizar calendario
-  renderCalendar();
-  
-  // Cargar eventos del mes actual
-  loadCalendarEvents();
-  
-  CalendarState.isInitialized = true;
-  console.log('✓ Calendario inicializado');
+  // Esperar a que el DOM esté listo
+  setTimeout(() => {
+    renderCalendar();
+    
+    // Cargar eventos del mes actual
+    loadCalendarEvents();
+    
+    CalendarState.isInitialized = true;
+    console.log('✓ Calendario inicializado');
+  }, 100);
 }
 
 // ============================================
@@ -85,8 +85,12 @@ function setupCalendarListeners() {
 // RENDERIZADO DEL CALENDARIO
 // ============================================
 function renderCalendar() {
+  console.log('📅 Renderizando calendario...');
+  
   const year = CalendarState.currentDate.getFullYear();
   const month = CalendarState.currentDate.getMonth();
+  
+  console.log(`  - Año: ${year}, Mes: ${month}`);
   
   // Actualizar título del mes
   const monthNames = [
@@ -97,6 +101,9 @@ function renderCalendar() {
   const monthTitle = document.getElementById('calendarMonthTitle');
   if (monthTitle) {
     monthTitle.textContent = `${monthNames[month]} ${year}`;
+    console.log(`  - Título actualizado: ${monthNames[month]} ${year}`);
+  } else {
+    console.error('✗ calendarMonthTitle no encontrado');
   }
   
   // Calcular días del mes
@@ -105,13 +112,20 @@ function renderCalendar() {
   const startingDay = firstDay.getDay();
   const totalDays = lastDay.getDate();
   
+  console.log(`  - Día inicial: ${startingDay}, Total días: ${totalDays}`);
+  
   // Renderizar grid
   const calendarGrid = document.getElementById('calendarGrid');
-  if (!calendarGrid) return;
+  if (!calendarGrid) {
+    console.error('✗ calendarGrid no encontrado');
+    return;
+  }
   
+  console.log('  - Limpiando grid...');
   calendarGrid.innerHTML = '';
   
   // Días vacíos antes del primer día
+  console.log(`  - Agregando ${startingDay} celdas vacías`);
   for (let i = 0; i < startingDay; i++) {
     const emptyCell = document.createElement('div');
     emptyCell.className = 'calendar-cell calendar-cell-empty';
@@ -120,6 +134,7 @@ function renderCalendar() {
   
   // Días del mes
   const today = new Date();
+  console.log(`  - Agregando ${totalDays} días del mes`);
   for (let day = 1; day <= totalDays; day++) {
     const cell = document.createElement('div');
     cell.className = 'calendar-cell';
@@ -127,8 +142,8 @@ function renderCalendar() {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     
     // Marcar hoy
-    const isToday = today.getDate() === day && 
-                   today.getMonth() === month && 
+    const isToday = today.getDate() === day &&
+                   today.getMonth() === month &&
                    today.getFullYear() === year;
     
     if (isToday) {
@@ -163,6 +178,8 @@ function renderCalendar() {
     
     calendarGrid.appendChild(cell);
   }
+  
+  console.log(`✓ Calendario renderizado con ${calendarGrid.children.length} celdas`);
 }
 
 // ============================================
