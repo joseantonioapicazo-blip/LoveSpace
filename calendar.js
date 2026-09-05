@@ -23,7 +23,7 @@ function initializeCalendar() {
   
   // Esperar a que el DOM esté listo
   setTimeout(() => {
-    renderCalendar();
+    renderCalendarGrid();
     
     // Cargar eventos del mes actual
     loadCalendarEvents();
@@ -46,7 +46,7 @@ function setupCalendarListeners() {
   if (prevMonthBtn) {
     prevMonthBtn.addEventListener('click', () => {
       CalendarState.currentDate.setMonth(CalendarState.currentDate.getMonth() - 1);
-      renderCalendar();
+      renderCalendarGrid();
       loadCalendarEvents();
     });
   }
@@ -54,7 +54,7 @@ function setupCalendarListeners() {
   if (nextMonthBtn) {
     nextMonthBtn.addEventListener('click', () => {
       CalendarState.currentDate.setMonth(CalendarState.currentDate.getMonth() + 1);
-      renderCalendar();
+      renderCalendarGrid();
       loadCalendarEvents();
     });
   }
@@ -62,7 +62,7 @@ function setupCalendarListeners() {
   if (todayBtn) {
     todayBtn.addEventListener('click', () => {
       CalendarState.currentDate = new Date();
-      renderCalendar();
+      renderCalendarGrid();
       loadCalendarEvents();
     });
   }
@@ -84,7 +84,7 @@ function setupCalendarListeners() {
 // ============================================
 // RENDERIZADO DEL CALENDARIO
 // ============================================
-function renderCalendar() {
+function renderCalendarGrid() {
   console.log('📅 Renderizando calendario...');
   
   const year = CalendarState.currentDate.getFullYear();
@@ -187,7 +187,7 @@ function renderCalendar() {
 // ============================================
 function selectDate(dateStr) {
   CalendarState.selectedDate = dateStr;
-  renderCalendar();
+  renderCalendarGrid();
   showDayEvents(dateStr);
 }
 
@@ -236,7 +236,7 @@ async function loadCalendarEvents() {
     });
     
     console.log(`✓ ${eventsSnapshot.size} eventos cargados para ${year}-${month + 1}`);
-    renderCalendar();
+    renderCalendarGrid();
     
   } catch (error) {
     console.error('✗ Error al cargar eventos:', error);
@@ -365,13 +365,13 @@ async function saveEvent() {
     // Recargar eventos
     const eventMonth = eventDate.getMonth();
     const eventYear = eventDate.getFullYear();
-    
-    if (eventMonth === CalendarState.currentDate.getMonth() && 
+
+    if (eventMonth === CalendarState.currentDate.getMonth() &&
         eventYear === CalendarState.currentDate.getFullYear()) {
       await loadCalendarEvents();
     } else {
       CalendarState.currentDate = eventDate;
-      renderCalendar();
+      renderCalendarGrid();
       await loadCalendarEvents();
     }
     
