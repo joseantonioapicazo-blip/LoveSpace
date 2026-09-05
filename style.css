@@ -2275,7 +2275,7 @@ textarea:focus-visible {
    ============================================ */
 
 .calendar-container {
-  max-width: 95%;a
+  max-width: 95%;
   width: 100%;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
@@ -2373,9 +2373,11 @@ textarea:focus-visible {
 
 .calendar-weekdays {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, 1fr);
   gap: clamp(2px, 0.5vw, var(--spacing-xs));
   margin-bottom: var(--spacing-sm);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .calendar-weekday {
@@ -2383,14 +2385,18 @@ textarea:focus-visible {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-secondary);
-  padding: var(--spacing-sm);
+  padding: clamp(4px, 1vh, var(--spacing-sm));
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, 1fr);
   gap: clamp(2px, 0.5vw, var(--spacing-xs));
   min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .calendar-cell {
