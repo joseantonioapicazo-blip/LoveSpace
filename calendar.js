@@ -9,9 +9,6 @@ const CalendarState = {
   isInitialized: false
 };
 
-// Inicializar con la fecha actual correcta
-CalendarState.currentDate = new Date();
-
 // ============================================
 // INICIALIZACIÓN
 // ============================================
@@ -103,6 +100,17 @@ function setupCalendarListeners() {
     });
   }
 
+  // Cerrar modal
+  const closeEventModal = document.getElementById('closeEventModal');
+  if (closeEventModal) {
+    closeEventModal.addEventListener('click', calendarCloseEventModal);
+  }
+
+  const cancelEventModal = document.getElementById('cancelEventModal');
+  if (cancelEventModal) {
+    cancelEventModal.addEventListener('click', calendarCloseEventModal);
+  }
+
   console.log('✓ Listeners del calendario configurados');
 }
 
@@ -123,12 +131,12 @@ function renderCalendarGrid() {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
   
-  const monthTitle = document.getElementById('calendarMonthTitle');
+  const monthTitle = document.getElementById('calendarMonth');
   if (monthTitle) {
     monthTitle.textContent = `${monthNames[month]} ${year}`;
     console.log(`  - Título actualizado: ${monthNames[month]} ${year}`);
   } else {
-    console.error('✗ calendarMonthTitle no encontrado');
+    console.error('✗ calendarMonth no encontrado');
   }
   
   // Calcular días del mes
@@ -156,7 +164,8 @@ function renderCalendarGrid() {
   console.log(`  - Agregando ${startingDay} celdas vacías`);
   for (let i = 0; i < startingDay; i++) {
     const emptyCell = document.createElement('div');
-    emptyCell.className = 'calendar-cell calendar-cell-empty';
+    emptyCell.className = 'day other';
+    emptyCell.innerHTML = '<span class="day-number">—</span>';
     calendarGrid.appendChild(emptyCell);
   }
   
@@ -165,7 +174,7 @@ function renderCalendarGrid() {
   console.log(`  - Agregando ${totalDays} días del mes`);
   for (let day = 1; day <= totalDays; day++) {
     const cell = document.createElement('div');
-    cell.className = 'calendar-cell';
+    cell.className = 'day';
     
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     
@@ -175,27 +184,27 @@ function renderCalendarGrid() {
                    today.getFullYear() === year;
     
     if (isToday) {
-      cell.classList.add('calendar-cell-today');
+      cell.classList.add('today');
     }
     
     // Marcar seleccionado
     if (CalendarState.selectedDate === dateStr) {
-      cell.classList.add('calendar-cell-selected');
+      cell.classList.add('selected');
     }
     
     // Marcar días con eventos
     if (CalendarState.events[dateStr] && CalendarState.events[dateStr].length > 0) {
-      cell.classList.add('calendar-cell-has-events');
+      cell.classList.add('has-events');
       
       // Agregar indicador de eventos
       const eventIndicator = document.createElement('div');
-      eventIndicator.className = 'calendar-event-indicator';
+      eventIndicator.className = 'event-indicator';
       cell.appendChild(eventIndicator);
     }
     
     // Número del día
     const dayNumber = document.createElement('span');
-    dayNumber.className = 'calendar-day-number';
+    dayNumber.className = 'day-number';
     dayNumber.textContent = day;
     cell.appendChild(dayNumber);
     
@@ -344,13 +353,13 @@ function calendarOpenEventModal(dateStr = null) {
     dateInput.value = new Date().toISOString().split('T')[0];
   }
   
-  modal.classList.remove('hidden');
+  modal.style.display = 'grid';
 }
 
 function calendarCloseEventModal() {
   const modal = document.getElementById('calendarEventModal');
   if (modal) {
-    modal.classList.add('hidden');
+    modal.style.display = 'none';
   }
 }
 
@@ -362,7 +371,10 @@ async function calendarSaveEvent() {
   const titulo = document.getElementById('eventTitle').value;
   const descripcion = document.getElementById('eventDescription').value;
   const fecha = document.getElementById('eventDate').value;
-  const color = document.getElementById('eventColor').value;
+  
+  // Obtener color seleccionado de los radio buttons
+  const colorInput = document.querySelector('input[name="eventColor"]:checked');
+  const color = colorInput ? colorInput.value : '#ff6b6b';
   
   if (!titulo || !fecha) {
     showNotification('Por favor completa el título y la fecha', 'error');
