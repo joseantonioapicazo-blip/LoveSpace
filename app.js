@@ -664,72 +664,82 @@ async function unlinkPartner() {
 // NAVEGACIÓN
 // ============================================
 function setupNavigation() {
-  // Navegación inferior (móvil)
+  // Navegación lateral (Two-Coffe)
   const navItems = document.querySelectorAll('.nav-item');
   navItems.forEach(item => {
     item.addEventListener('click', () => {
-      const section = item.dataset.section;
-      navigateTo(section);
+      const page = item.dataset.page;
+      navigateTo(page);
     });
   });
 
-  // Navegación lateral (desktop)
-  const sidebarItems = document.querySelectorAll('.sidebar-item');
-  sidebarItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const section = item.dataset.section;
-      navigateTo(section);
+  // Menú móvil
+  const mobileMenu = document.getElementById('mobileMenu');
+  const sidebar = document.getElementById('sidebar');
+  if (mobileMenu && sidebar) {
+    mobileMenu.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
     });
-  });
-
-  // Accesos rápidos
-  const quickAccessCards = document.querySelectorAll('.quick-access-card');
-  quickAccessCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const section = card.dataset.section;
-      navigateTo(section);
-    });
-  });
+  }
 }
 
-function navigateTo(section) {
+function navigateTo(page) {
   // Actualizar estado
-  AppState.currentSection = section;
+  AppState.currentSection = page;
 
-  // Ocultar todas las secciones
-  document.querySelectorAll('.content-section').forEach(s => {
-    s.classList.remove('active');
+  // Ocultar todas las páginas
+  document.querySelectorAll('.page').forEach(p => {
+    p.setAttribute('hidden', '');
   });
 
-  // Mostrar sección seleccionada
-  const targetSection = document.getElementById(section + 'Section');
-  if (targetSection) {
-    targetSection.classList.add('active');
+  // Mostrar página seleccionada
+  const targetPage = document.getElementById('page-' + page);
+  if (targetPage) {
+    targetPage.removeAttribute('hidden');
   }
 
-  // Actualizar navegación inferior (móvil)
+  // Actualizar navegación lateral
   document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.remove('active');
-    if (item.dataset.section === section) {
+    if (item.dataset.page === page) {
       item.classList.add('active');
     }
   });
 
-  // Actualizar navegación lateral (desktop)
-  document.querySelectorAll('.sidebar-item').forEach(item => {
-    item.classList.remove('active');
-    if (item.dataset.section === section) {
-      item.classList.add('active');
-    }
-  });
+  // Actualizar título de página
+  const pageTitle = document.getElementById('pageTitle');
+  const pageSubtitle = document.getElementById('pageSubtitle');
+  
+  const titles = {
+    'dashboard': { title: 'Inicio', subtitle: 'Tu espacio compartido.' },
+    'calendar': { title: 'Calendario', subtitle: 'Organiza tus momentos especiales.' },
+    'album': { title: 'Álbum', subtitle: 'Tus recuerdos compartidos.' },
+    'notes': { title: 'Notas', subtitle: 'Tus notas compartidas.' },
+    'thoughts': { title: 'Pensamientos', subtitle: 'Tus pensamientos.' },
+    'poems': { title: 'Poemas', subtitle: 'Tus poemas.' },
+    'letters': { title: 'Cartas', subtitle: 'Tus cartas.' },
+    'location': { title: 'Ubicación', subtitle: 'Ubicación compartida.' },
+    'event': { title: 'Evento del mes', subtitle: 'Eventos especiales.' },
+    'profile': { title: 'Perfil', subtitle: 'Tu información.' },
+    'settings': { title: 'Configuración', subtitle: 'Ajustes de la aplicación.' }
+  };
+
+  if (titles[page] && pageTitle) {
+    pageTitle.textContent = titles[page].title;
+    if (pageSubtitle) pageSubtitle.textContent = titles[page].subtitle;
+  }
+
+  // Cerrar menú móvil en móviles
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.classList.remove('open');
 
   // Cargar datos específicos de la sección
-  loadSectionData(section);
+  loadSectionData(page);
 }
 
-function loadSectionData(section) {
-  switch (section) {
-    case 'home':
+function loadSectionData(page) {
+  switch (page) {
+    case 'dashboard':
       loadHomeData();
       break;
     case 'calendar':
@@ -755,9 +765,13 @@ function loadSectionData(section) {
       break;
     case 'profile':
       loadProfile();
+      loadStatistics();
       break;
     case 'event':
       loadEventSection();
+      break;
+    case 'settings':
+      loadSettings();
       break;
   }
 }
@@ -789,8 +803,13 @@ function hideAllScreens() {
 function loadHomeData() {
   if (!AppState.coupleData) return;
   
-  // Actualizar nombre de usuario
-  document.getElementById('userName').textContent = AppState.userData.nombre.split(' ')[0];
+  // Actualizar avatar en header
+  const headerAvatar = document.getElementById('headerAvatar');
+  if (headerAvatar && AppState.userData.foto) {
+    headerAvatar.innerHTML = `<img src="${AppState.userData.foto}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+  } else if (headerAvatar) {
+    headerAvatar.textContent = AppState.userData.nombre.charAt(0).toUpperCase();
+  }
   
   // Actualizar fotos de la pareja
   const users = AppState.coupleData.users || [];
@@ -805,12 +824,45 @@ function loadHomeData() {
   // Actualizar fecha de aniversario
   if (AppState.coupleData.aniversario) {
     const anniversaryDate = AppState.coupleData.aniversario.toDate();
-    document.getElementById('togetherSince').textContent = 
-      `Juntos desde ${anniversaryDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+    const relationshipDate = document.getElementById('relationshipDate');
+    if (relationshipDate) {
+      relationshipDate.textContent = 
+        `Juntos desde ${anniversaryDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+    }
   }
+  
+  // Actualizar contadores de tiempo juntos
+  updateTimeCounters();
   
   // Cargar actividad reciente
   loadRecentActivity();
+}
+
+function updateTimeCounters() {
+  if (!AppState.coupleData || !AppState.coupleData.aniversario) return;
+  
+  const anniversary = AppState.coupleData.aniversario.toDate();
+  const now = new Date();
+  
+  const diff = now - anniversary;
+  
+  const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+  const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor(diff / (1000 * 60));
+  
+  const yearsEl = document.getElementById('years');
+  const monthsEl = document.getElementById('months');
+  const daysEl = document.getElementById('days');
+  const hoursEl = document.getElementById('hours');
+  const minutesEl = document.getElementById('minutes');
+  
+  if (yearsEl) yearsEl.textContent = years;
+  if (monthsEl) monthsEl.textContent = months % 12;
+  if (daysEl) daysEl.textContent = days % 30;
+  if (hoursEl) hoursEl.textContent = String(hours % 24).padStart(2, '0');
+  if (minutesEl) minutesEl.textContent = String(minutes % 60).padStart(2, '0');
 }
 
 async function loadCouplePhotos(users) {
@@ -824,9 +876,12 @@ async function loadCouplePhotos(users) {
       const user1Data = user1Doc.data();
       const user2Data = user2Doc.data();
       
-      document.getElementById('user1Photo').src = user1Data.foto || '';
-      document.getElementById('user2Photo').src = user2Data.foto || '';
-      document.getElementById('headerUserPhoto').src = AppState.userData.foto || '';
+      // En la nueva interfaz, las fotos de la pareja no se muestran en el dashboard
+      // Solo el avatar del usuario en el header
+      const headerAvatar = document.getElementById('headerAvatar');
+      if (headerAvatar && AppState.userData.foto) {
+        headerAvatar.innerHTML = `<img src="${AppState.userData.foto}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      }
     }
   } catch (error) {
     console.error('✗ Error al cargar fotos:', error);
@@ -847,7 +902,10 @@ async function loadCoupleNames(users) {
       const name1 = user1Data.nombre.split(' ')[0];
       const name2 = user2Data.nombre.split(' ')[0];
       
-      document.getElementById('coupleNames').textContent = `${name1} & ${name2}`;
+      const coupleNamesEl = document.getElementById('coupleNames');
+      if (coupleNamesEl) {
+        coupleNamesEl.textContent = `${name1} & ${name2}`;
+      }
     }
   } catch (error) {
     console.error('✗ Error al cargar nombres:', error);
@@ -859,78 +917,11 @@ async function loadRecentActivity() {
   
   try {
     const db = getDB();
-    const activityList = document.getElementById('recentActivityList');
     
-    // Obtener actividad reciente (pensamientos, fotos, notas)
-    const thoughtsSnapshot = await db.collection('couples').doc(AppState.coupleId)
-      .collection('pensamientos')
-      .orderBy('fecha', 'desc')
-      .limit(5)
-      .get();
+    // En la nueva interfaz, no hay una lista de actividad reciente en el dashboard
+    // Esta función puede implementarse más adelante si se desea
     
-    const photosSnapshot = await db.collection('couples').doc(AppState.coupleId)
-      .collection('fotos')
-      .orderBy('fecha', 'desc')
-      .limit(5)
-      .get();
-    
-    const notesSnapshot = await db.collection('couples').doc(AppState.coupleId)
-      .collection('notas')
-      .orderBy('fecha', 'desc')
-      .limit(5)
-      .get();
-    
-    // Combinar y ordenar por fecha
-    const activities = [];
-    
-    thoughtsSnapshot.forEach(doc => {
-      const data = doc.data();
-      activities.push({
-        type: 'thought',
-        icon: '💭',
-        text: `Nuevo pensamiento de ${data.autorNombre}`,
-        date: data.fecha
-      });
-    });
-    
-    photosSnapshot.forEach(doc => {
-      const data = doc.data();
-      activities.push({
-        type: 'photo',
-        icon: '📸',
-        text: `Nueva foto de ${data.autorNombre}`,
-        date: data.fecha
-      });
-    });
-    
-    notesSnapshot.forEach(doc => {
-      const data = doc.data();
-      activities.push({
-        type: 'note',
-        icon: '📝',
-        text: `Nueva nota de ${data.autorNombre}`,
-        date: data.fecha
-      });
-    });
-    
-    // Ordenar por fecha
-    activities.sort((a, b) => b.date - a.date);
-    
-    // Mostrar actividades
-    if (activities.length > 0) {
-      activityList.innerHTML = activities.slice(0, 5).map(activity => `
-        <div class="activity-item">
-          <div class="activity-icon">${activity.icon}</div>
-          <div class="activity-content">
-            <p>${activity.text}</p>
-            <span>${formatFirestoreDateTime(activity.date)}</span>
-          </div>
-        </div>
-      `).join('');
-    } else {
-      activityList.innerHTML = '<p class="empty-state">No hay actividad reciente</p>';
-    }
-    
+    console.log('✓ Actividad reciente cargada (no mostrada en dashboard actual)');
   } catch (error) {
     console.error('✗ Error al cargar actividad reciente:', error);
   }
@@ -2343,21 +2334,20 @@ let profileListenersSetup = false;
 async function loadProfile() {
   if (!AppState.userData) return;
   
-  // Información del usuario
-  const profilePhotoEl = document.getElementById('profilePhoto');
+  // Información del usuario - nuevos IDs Two-Coffe
+  const profileAvatarEl = document.getElementById('profileAvatar');
   const profileNameEl = document.getElementById('profileName');
   const profileEmailEl = document.getElementById('profileEmail');
-  const profileCoupleCodeEl = document.getElementById('profileCoupleCode');
-  const profileMemberSinceEl = document.getElementById('profileMemberSince');
   
-  if (profilePhotoEl) profilePhotoEl.src = AppState.userData.foto || '';
+  if (profileAvatarEl) {
+    if (AppState.userData.foto) {
+      profileAvatarEl.innerHTML = `<img src="${AppState.userData.foto}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    } else {
+      profileAvatarEl.textContent = AppState.userData.nombre.charAt(0).toUpperCase();
+    }
+  }
   if (profileNameEl) profileNameEl.textContent = AppState.userData.nombre;
   if (profileEmailEl) profileEmailEl.textContent = AppState.userData.email;
-  if (profileCoupleCodeEl) profileCoupleCodeEl.textContent = AppState.userData.codigo || '--';
-  if (profileMemberSinceEl) {
-    profileMemberSinceEl.textContent = 
-      AppState.userData.creado ? formatFirestoreDate(AppState.userData.creado) : '--';
-  }
   
   // Información de la pareja
   if (AppState.coupleData) {
@@ -2408,10 +2398,16 @@ async function loadStatistics() {
     const thoughtsSnapshot = await db.collection('couples').doc(AppState.coupleId)
       .collection('pensamientos').get();
     
-    document.getElementById('statEvents').textContent = eventsSnapshot.size;
-    document.getElementById('statPhotos').textContent = photosSnapshot.size;
-    document.getElementById('statNotes').textContent = notesSnapshot.size;
-    document.getElementById('statThoughts').textContent = thoughtsSnapshot.size;
+    // Nuevos IDs Two-Coffe
+    const photoCountEl = document.getElementById('photoCount');
+    const noteCountEl = document.getElementById('noteCount');
+    const thoughtCountEl = document.getElementById('thoughtCount');
+    const eventCountEl = document.getElementById('eventCount');
+    
+    if (photoCountEl) photoCountEl.textContent = photosSnapshot.size;
+    if (noteCountEl) noteCountEl.textContent = notesSnapshot.size;
+    if (thoughtCountEl) thoughtCountEl.textContent = thoughtsSnapshot.size;
+    if (eventCountEl) eventCountEl.textContent = eventsSnapshot.size;
     
   } catch (error) {
     console.error('✗ Error al cargar estadísticas:', error);
@@ -2422,30 +2418,110 @@ async function loadStatistics() {
 // CONFIGURACIÓN
 // ============================================
 function loadSettings() {
-  // Cargar tema
-  const savedTheme = localStorage.getItem('theme') || 'pink';
-  document.getElementById('themeSelect').value = savedTheme;
-  applyTheme(savedTheme);
+  // Cargar tema - nuevos IDs Two-Coffe
+  const savedTheme = localStorage.getItem('theme') || 'brown';
   
-  // Cargar modo oscuro
+  // Actualizar tema activo
+  document.querySelectorAll('.theme').forEach(themeBtn => {
+    themeBtn.classList.remove('active');
+    if (themeBtn.classList.contains(`theme-${savedTheme}`)) {
+      themeBtn.classList.add('active');
+    }
+  });
+  
+  // Cargar switches
   const darkMode = localStorage.getItem('darkMode') === 'true';
-  document.getElementById('darkModeToggle').checked = darkMode;
-  if (darkMode) {
-    document.body.classList.add('dark-mode');
+  const darkModeSwitch = document.getElementById('darkModeSwitch');
+  if (darkModeSwitch) {
+    if (darkMode) darkModeSwitch.classList.add('active');
+    else darkModeSwitch.classList.remove('active');
+  }
+  
+  const eventNotifications = localStorage.getItem('eventNotifications') !== 'false';
+  const eventNotificationsSwitch = document.getElementById('eventNotificationsSwitch');
+  if (eventNotificationsSwitch) {
+    if (eventNotifications) eventNotificationsSwitch.classList.add('active');
+    else eventNotificationsSwitch.classList.remove('active');
+  }
+  
+  const reminders = localStorage.getItem('reminders') !== 'false';
+  const reminderSwitch = document.getElementById('reminderSwitch');
+  if (reminderSwitch) {
+    if (reminders) reminderSwitch.classList.add('active');
+    else reminderSwitch.classList.remove('active');
+  }
+  
+  const locationSharing = localStorage.getItem('locationSharing') === 'true';
+  const locationSwitch = document.getElementById('locationSwitch');
+  if (locationSwitch) {
+    if (locationSharing) locationSwitch.classList.add('active');
+    else locationSwitch.classList.remove('active');
   }
   
   // Listeners de configuración
-  document.getElementById('themeSelect').addEventListener('change', (e) => {
-    const theme = e.target.value;
-    localStorage.setItem('theme', theme);
-    applyTheme(theme);
+  setupSettingsListeners();
+}
+
+function setupSettingsListeners() {
+  // Temas
+  document.querySelectorAll('.theme').forEach(themeBtn => {
+    themeBtn.addEventListener('click', () => {
+      const theme = themeBtn.className.replace('theme ', '').replace(' active', '');
+      localStorage.setItem('theme', theme);
+      document.querySelectorAll('.theme').forEach(t => t.classList.remove('active'));
+      themeBtn.classList.add('active');
+    });
   });
   
-  document.getElementById('darkModeToggle').addEventListener('change', (e) => {
-    const darkMode = e.target.checked;
-    localStorage.setItem('darkMode', darkMode.toString());
-    document.body.classList.toggle('dark-mode', darkMode);
-  });
+  // Switches
+  const darkModeSwitch = document.getElementById('darkModeSwitch');
+  if (darkModeSwitch) {
+    darkModeSwitch.addEventListener('click', () => {
+      darkModeSwitch.classList.toggle('active');
+      const isActive = darkModeSwitch.classList.contains('active');
+      localStorage.setItem('darkMode', isActive.toString());
+    });
+  }
+  
+  const eventNotificationsSwitch = document.getElementById('eventNotificationsSwitch');
+  if (eventNotificationsSwitch) {
+    eventNotificationsSwitch.addEventListener('click', () => {
+      eventNotificationsSwitch.classList.toggle('active');
+      const isActive = eventNotificationsSwitch.classList.contains('active');
+      localStorage.setItem('eventNotifications', isActive.toString());
+    });
+  }
+  
+  const reminderSwitch = document.getElementById('reminderSwitch');
+  if (reminderSwitch) {
+    reminderSwitch.addEventListener('click', () => {
+      reminderSwitch.classList.toggle('active');
+      const isActive = reminderSwitch.classList.contains('active');
+      localStorage.setItem('reminders', isActive.toString());
+    });
+  }
+  
+  const locationSwitch = document.getElementById('locationSwitch');
+  if (locationSwitch) {
+    locationSwitch.addEventListener('click', () => {
+      locationSwitch.classList.toggle('active');
+      const isActive = locationSwitch.classList.contains('active');
+      localStorage.setItem('locationSharing', isActive.toString());
+    });
+  }
+  
+  // Botones de acción
+  const unlinkPartnerBtn = document.getElementById('unlinkPartnerBtn');
+  if (unlinkPartnerBtn && !unlinkPartnerBtn.hasAttribute('data-listener')) {
+    unlinkPartnerBtn.addEventListener('click', unlinkPartner);
+    unlinkPartnerBtn.setAttribute('data-listener', 'true');
+  }
+  
+  const signOutBtn = document.getElementById('signOutBtn');
+  if (signOutBtn && !signOutBtn.hasAttribute('data-listener')) {
+    signOutBtn.addEventListener('click', signOut);
+    signOutBtn.setAttribute('data-listener', 'true');
+  }
 }
 
 function applyTheme(theme) {
