@@ -6,22 +6,15 @@ const CalendarState = {
   currentDate: new Date(),
   selectedDate: null,
   events: {},
-  isInitialized: false
+  isInitialized: false,
+  listenersSetup: false,
+  currentMonthQuery: `${new Date().getFullYear()}-${new Date().getMonth()}` // Para rastrear la consulta actual
 };
 
 // ============================================
-// ELEMENTOS
+// ELEMENTOS (cacheados después de la inicialización)
 // ============================================
-const monthTitle = document.getElementById("monthTitle");
-const calendarGrid = document.getElementById("calendarGrid");
-const selectedDayTitle = document.getElementById("selectedDayTitle");
-const selectedDayEvents = document.getElementById("selectedDayEvents");
-const eventModal = document.getElementById("eventModal");
-const eventForm = document.getElementById("eventForm");
-const eventTitle = document.getElementById("eventTitle");
-const eventDate = document.getElementById("eventDate");
-const eventDescription = document.getElementById("eventDescription");
-const eventColor = document.getElementById("eventColor");
+let monthTitle, calendarGrid, selectedDayTitle, selectedDayEvents, eventModal, eventForm, eventTitle, eventDate, eventDescription, eventColor;
 
 // ============================================
 // UTILIDADES DE FECHA
@@ -66,23 +59,54 @@ function escapeHTML(value) {
 // ============================================
 function initializeCalendar() {
   console.log('📅 Inicializando calendario...');
-  
-  // Resetear estado para permitir re-inicialización
-  CalendarState.isInitialized = false;
-  
-  // Configurar listeners
-  setupCalendarListeners();
-  
-  // Esperar a que el DOM esté listo
-  setTimeout(() => {
-    renderCalendar();
-    
-    // Cargar eventos del mes actual
-    loadCalendarEvents();
-    
-    CalendarState.isInitialized = true;
-    console.log('✓ Calendario inicializado');
-  }, 100);
+
+  // Cache elementos del DOM
+  cacheCalendarElements();
+
+  // Verificar que existan los elementos
+  if (!validateCalendarElements()) {
+    console.error('✗ Elementos del calendario no encontrados');
+    return;
+  }
+
+  // Configurar listeners solo una vez
+  if (!CalendarState.listenersSetup) {
+    setupCalendarListeners();
+    CalendarState.listenersSetup = true;
+  }
+
+  // Renderizar calendario
+  renderCalendar();
+
+  // Cargar eventos del mes actual
+  loadCalendarEvents();
+
+  CalendarState.isInitialized = true;
+  console.log('✓ Calendario inicializado');
+}
+
+// ============================================
+// CACHEAR ELEMENTOS DEL DOM
+// ============================================
+function cacheCalendarElements() {
+  monthTitle = document.getElementById("monthTitle");
+  calendarGrid = document.getElementById("calendarGrid");
+  selectedDayTitle = document.getElementById("selectedDayTitle");
+  selectedDayEvents = document.getElementById("selectedDayEvents");
+  eventModal = document.getElementById("eventModal");
+  eventForm = document.getElementById("eventForm");
+  eventTitle = document.getElementById("eventTitle");
+  eventDate = document.getElementById("eventDate");
+  eventDescription = document.getElementById("eventDescription");
+  eventColor = document.getElementById("eventColor");
+}
+
+// ============================================
+// VALIDAR ELEMENTOS DEL DOM
+// ============================================
+function validateCalendarElements() {
+  return monthTitle && calendarGrid && selectedDayTitle && selectedDayEvents &&
+         eventModal && eventForm && eventTitle && eventDate && eventDescription && eventColor;
 }
 
 // ============================================
@@ -98,6 +122,7 @@ function setupCalendarListeners() {
       CalendarState.currentDate.getMonth() - 1,
       1
     );
+    CalendarState.currentMonthQuery = `${CalendarState.currentDate.getFullYear()}-${CalendarState.currentDate.getMonth()}`;
     renderCalendar();
     loadCalendarEvents();
   });
@@ -108,6 +133,7 @@ function setupCalendarListeners() {
       CalendarState.currentDate.getMonth() + 1,
       1
     );
+    CalendarState.currentMonthQuery = `${CalendarState.currentDate.getFullYear()}-${CalendarState.currentDate.getMonth()}`;
     renderCalendar();
     loadCalendarEvents();
   });
@@ -117,6 +143,7 @@ function setupCalendarListeners() {
     const today = new Date();
     CalendarState.currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
     CalendarState.selectedDate = dateKey(today);
+    CalendarState.currentMonthQuery = `${today.getFullYear()}-${today.getMonth()}`;
     renderCalendar();
     renderSelectedDay();
     loadCalendarEvents();
@@ -209,7 +236,7 @@ function renderCalendar() {
     }
 
     if (CalendarState.selectedDate === key) {
-      cell.style.background = "var(--surface-soft)";
+      cell.classList.add("selected");
     }
 
     const number = document.createElement("div");
@@ -262,6 +289,7 @@ function selectDate(key) {
   if (selected.getMonth() !== CalendarState.currentDate.getMonth() ||
       selected.getFullYear() !== CalendarState.currentDate.getFullYear()) {
     CalendarState.currentDate = new Date(selected.getFullYear(), selected.getMonth(), 1);
+    CalendarState.currentMonthQuery = `${selected.getFullYear()}-${selected.getMonth()}`;
   }
 
   renderCalendar();
@@ -317,17 +345,27 @@ async function loadCalendarEvents() {
   const year = CalendarState.currentDate.getFullYear();
   const month = CalendarState.currentDate.getMonth();
 
+  // Crear identificador único para esta consulta
+  const queryId = `${year}-${month}`;
+
   try {
     const db = getDB();
     const startDate = new Date(year, month, 1);
-    const endDate = new Date(year, month + 1, 0);
+    // Usar el primer día del siguiente mes para incluir todos los eventos del mes actual
+    const endDate = new Date(year, month + 1, 1);
 
     const eventsSnapshot = await db.collection('couples')
       .doc(AppState.coupleId)
       .collection('calendario')
       .where('fecha', '>=', startDate)
-      .where('fecha', '<=', endDate)
+      .where('fecha', '<', endDate)
       .get();
+
+    // Verificar que esta consulta sigue siendo relevante
+    if (CalendarState.currentMonthQuery !== queryId) {
+      console.log('⚠ Consulta obsoleta ignorada:', queryId);
+      return;
+    }
 
     CalendarState.events = {};
 
@@ -357,7 +395,9 @@ async function loadCalendarEvents() {
 
   } catch (error) {
     console.error('✗ Error al cargar eventos:', error);
-    showNotification('Error al cargar eventos del calendario', 'error');
+    if (typeof showNotification === 'function') {
+      showNotification('Error al cargar eventos del calendario', 'error');
+    }
   }
 }
 
@@ -392,18 +432,47 @@ function closeEventModal() {
 async function saveEvent(event) {
   event.preventDefault();
 
+  // Validaciones
+  if (!AppState.coupleId) {
+    console.error('✗ No hay coupleId');
+    if (typeof showNotification === 'function') {
+      showNotification('Error: no hay pareja conectada', 'error');
+    }
+    return;
+  }
+
+  if (!AppState.currentUser || !AppState.currentUser.uid) {
+    console.error('✗ No hay usuario autenticado');
+    if (typeof showNotification === 'function') {
+      showNotification('Error: usuario no autenticado', 'error');
+    }
+    return;
+  }
+
   const title = eventTitle.value.trim();
   const date = eventDate.value;
   const description = eventDescription.value.trim();
   const color = eventColor.value;
 
-  if (!title || !date) {
+  if (!title) {
+    if (typeof showNotification === 'function') {
+      showNotification('El título es obligatorio', 'error');
+    }
+    return;
+  }
+
+  if (!date) {
+    if (typeof showNotification === 'function') {
+      showNotification('La fecha es obligatoria', 'error');
+    }
     return;
   }
 
   try {
     const db = getDB();
-    const eventDate = new Date(date + 'T00:00:00');
+    // Parsear la fecha localmente sin timezone issues
+    const [year, month, day] = date.split('-').map(Number);
+    const eventDate = new Date(year, month - 1, day);
 
     await db.collection('couples')
       .doc(AppState.coupleId)
@@ -412,25 +481,30 @@ async function saveEvent(event) {
         titulo: title,
         descripcion: description,
         fecha: eventDate,
-        color: color,
+        color: color || '#8b6254',
         creadoPor: AppState.currentUser.uid,
         creadoEn: firebase.firestore.FieldValue.serverTimestamp()
       });
 
     console.log('✓ Evento guardado');
-    showNotification('Evento guardado correctamente', 'success');
+    if (typeof showNotification === 'function') {
+      showNotification('Evento guardado correctamente', 'success');
+    }
 
     closeEventModal();
 
     CalendarState.selectedDate = date;
     const selected = parseDateKey(date);
     CalendarState.currentDate = new Date(selected.getFullYear(), selected.getMonth(), 1);
+    CalendarState.currentMonthQuery = `${selected.getFullYear()}-${selected.getMonth()}`;
 
     await loadCalendarEvents();
 
   } catch (error) {
     console.error('✗ Error al guardar evento:', error);
-    showNotification('Error al guardar evento', 'error');
+    if (typeof showNotification === 'function') {
+      showNotification('Error al guardar evento', 'error');
+    }
   }
 }
 
@@ -438,8 +512,20 @@ async function saveEvent(event) {
 // ELIMINAR EVENTO
 // ============================================
 async function deleteEvent(id) {
+  // Validaciones
+  if (!AppState.coupleId) {
+    console.error('✗ No hay coupleId');
+    if (typeof showNotification === 'function') {
+      showNotification('Error: no hay pareja conectada', 'error');
+    }
+    return;
+  }
+
   const event = Object.values(CalendarState.events).flat().find(item => item.id === id);
-  if (!event) return;
+  if (!event) {
+    console.error('✗ Evento no encontrado:', id);
+    return;
+  }
 
   const confirmed = window.confirm(`¿Eliminar "${event.titulo}"?`);
   if (!confirmed) return;
@@ -453,13 +539,17 @@ async function deleteEvent(id) {
       .delete();
 
     console.log('✓ Evento eliminado');
-    showNotification('Evento eliminado', 'success');
+    if (typeof showNotification === 'function') {
+      showNotification('Evento eliminado', 'success');
+    }
 
     await loadCalendarEvents();
 
   } catch (error) {
     console.error('✗ Error al eliminar evento:', error);
-    showNotification('Error al eliminar evento', 'error');
+    if (typeof showNotification === 'function') {
+      showNotification('Error al eliminar evento', 'error');
+    }
   }
 }
 
