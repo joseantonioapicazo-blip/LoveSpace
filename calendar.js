@@ -8,13 +8,15 @@ const CalendarState = {
   events: {},
   isInitialized: false,
   listenersSetup: false,
-  currentMonthQuery: `${new Date().getFullYear()}-${new Date().getMonth()}` // Para rastrear la consulta actual
+  currentMonthQuery: `${new Date().getFullYear()}-${new Date().getMonth()}`, // Para rastrear la consulta actual
+  selectedPhotos: [], // Array para almacenar fotos seleccionadas temporalmente
+  selectedSong: null // Objeto para almacenar canción seleccionada temporalmente
 };
 
 // ============================================
 // ELEMENTOS (cacheados después de la inicialización)
 // ============================================
-let monthTitle, calendarGrid, selectedDayTitle, selectedDayEvents, eventModal, eventForm, eventTitle, eventDate, eventDescription, eventColor;
+let monthTitle, calendarGrid, selectedDayTitle, selectedDayEvents, eventModal, eventForm, eventTitle, eventDate, eventDescription, eventColor, photoUploadArea, photoInput, photoPreviewGallery, songUrl, addSongButton, songPreview;
 
 // ============================================
 // UTILIDADES DE FECHA
@@ -99,6 +101,12 @@ function cacheCalendarElements() {
   eventDate = document.getElementById("eventDate");
   eventDescription = document.getElementById("eventDescription");
   eventColor = document.getElementById("eventColor");
+  photoUploadArea = document.getElementById("photoUploadArea");
+  photoInput = document.getElementById("photoInput");
+  photoPreviewGallery = document.getElementById("photoPreviewGallery");
+  songUrl = document.getElementById("songUrl");
+  addSongButton = document.getElementById("addSongButton");
+  songPreview = document.getElementById("songPreview");
 }
 
 // ============================================
@@ -106,7 +114,8 @@ function cacheCalendarElements() {
 // ============================================
 function validateCalendarElements() {
   return monthTitle && calendarGrid && selectedDayTitle && selectedDayEvents &&
-         eventModal && eventForm && eventTitle && eventDate && eventDescription && eventColor;
+         eventModal && eventForm && eventTitle && eventDate && eventDescription && eventColor &&
+         photoUploadArea && photoInput && photoPreviewGallery && songUrl && addSongButton && songPreview;
 }
 
 // ============================================
@@ -180,6 +189,13 @@ function setupCalendarListeners() {
       eventColor.value = option.dataset.color;
     });
   });
+
+  // Upload de fotos
+  photoUploadArea.addEventListener("click", () => photoInput.click());
+  photoInput.addEventListener("change", handlePhotoUpload);
+
+  // Agregar canción
+  addSongButton.addEventListener("click", handleAddSong);
 
   console.log('✓ Listeners del calendario configurados');
 }
@@ -320,15 +336,53 @@ function renderSelectedDay() {
   events.forEach(event => {
     const item = document.createElement("div");
     item.className = "day-event-item";
+    item.style.position = "relative";
+
+    let extraContent = "";
+
+    // Mostrar fotos si existen
+    if (event.fotos && event.fotos.length > 0) {
+      extraContent += `
+        <div class="memory-photos">
+          ${event.fotos.map(foto => `
+            <div class="memory-photo">
+              <img src="${escapeHTML(foto)}" alt="Foto del recuerdo">
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // Mostrar canción si existe
+    if (event.cancion) {
+      const song = event.cancion;
+      extraContent += `
+        <div class="memory-song">
+          <div class="memory-song-cover">🎵</div>
+          <div class="memory-song-info">
+            <div class="memory-song-title">Canción de ${song.platform ? song.platform.charAt(0).toUpperCase() + song.platform.slice(1) : 'Música'}</div>
+            <div class="memory-song-artist">${song.url ? new URL(song.url).hostname : 'N/A'}</div>
+          </div>
+          <button type="button" class="memory-song-play" onclick="window.open('${escapeHTML(song.url)}', '_blank')">▶</button>
+        </div>
+      `;
+    }
+
     item.innerHTML = `
       <div class="event-color" style="background:${escapeHTML(event.color)}"></div>
       <div class="day-event-content">
         <div class="day-event-title">${escapeHTML(event.titulo)}</div>
         ${event.descripcion ? `<div class="day-event-description">${escapeHTML(event.descripcion)}</div>` : ""}
+        ${extraContent}
       </div>
-      <button class="delete-event" data-id="${escapeHTML(event.id)}">Eliminar</button>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+        <button class="delete-event" data-id="${escapeHTML(event.id)}">Eliminar</button>
+        <button class="share-button" data-id="${escapeHTML(event.id)}">Compartir</button>
+      </div>
     `;
+
     item.querySelector(".delete-event").addEventListener("click", () => deleteEvent(event.id));
+    item.querySelector(".share-button").addEventListener("click", (e) => showShareMenu(event, e));
     selectedDayEvents.appendChild(item);
   });
 }
@@ -383,7 +437,9 @@ async function loadCalendarEvents() {
         titulo: data.titulo,
         descripcion: data.descripcion,
         color: data.color || '#8b6254',
-        fecha: date
+        fecha: date,
+        fotos: data.fotos || [],
+        cancion: data.cancion || null
       });
     });
 
@@ -394,9 +450,9 @@ async function loadCalendarEvents() {
     }
 
   } catch (error) {
-    console.error('✗ Error al cargar eventos:', error);
+    console.error('✗ Error al cargar recuerdos:', error);
     if (typeof showNotification === 'function') {
-      showNotification('Error al cargar eventos del calendario', 'error');
+      showNotification('Error al cargar recuerdos del calendario', 'error');
     }
   }
 }
@@ -409,6 +465,13 @@ function openEventModal(date = null) {
   eventColor.value = "#8b6254";
   document.querySelectorAll(".color-option").forEach(option => option.classList.remove("selected"));
   document.querySelector('.color-option[data-color="#8b6254"]').classList.add("selected");
+
+  // Limpiar estado temporal
+  CalendarState.selectedPhotos = [];
+  CalendarState.selectedSong = null;
+  photoPreviewGallery.innerHTML = "";
+  songPreview.style.display = "none";
+  songUrl.value = "";
 
   if (date) {
     eventDate.value = date;
@@ -424,6 +487,105 @@ function openEventModal(date = null) {
 
 function closeEventModal() {
   eventModal.classList.remove("open");
+  // Limpiar estado temporal al cerrar
+  CalendarState.selectedPhotos = [];
+  CalendarState.selectedSong = null;
+}
+
+// ============================================
+// MANEJO DE FOTOS
+// ============================================
+function handlePhotoUpload(event) {
+  const files = Array.from(event.target.files);
+  files.forEach(file => {
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const photoData = {
+          file: file,
+          dataUrl: e.target.result,
+          name: file.name
+        };
+        CalendarState.selectedPhotos.push(photoData);
+        renderPhotoPreview();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+  // Reset input para permitir seleccionar la misma foto
+  event.target.value = '';
+}
+
+function renderPhotoPreview() {
+  photoPreviewGallery.innerHTML = "";
+  CalendarState.selectedPhotos.forEach((photo, index) => {
+    const previewItem = document.createElement("div");
+    previewItem.className = "memory-preview-item";
+    previewItem.innerHTML = `
+      <img src="${photo.dataUrl}" alt="${photo.name}">
+      <button type="button" class="memory-preview-remove" data-index="${index}">×</button>
+    `;
+    previewItem.querySelector(".memory-preview-remove").addEventListener("click", (e) => {
+      e.preventDefault();
+      CalendarState.selectedPhotos.splice(index, 1);
+      renderPhotoPreview();
+    });
+    photoPreviewGallery.appendChild(previewItem);
+  });
+}
+
+// ============================================
+// MANEJO DE CANCIONES
+// ============================================
+function handleAddSong() {
+  const url = songUrl.value.trim();
+  if (!url) return;
+
+  // Intentar identificar la plataforma y extraer información básica
+  let platform = "other";
+  let songInfo = { url: url, platform: platform };
+
+  if (url.includes("spotify.com")) {
+    platform = "spotify";
+    // Extraer información básica de Spotify si es posible
+    const match = url.match(/track\/([^?]+)/);
+    if (match) {
+      songInfo.id = match[1];
+    }
+  } else if (url.includes("youtube.com") || url.includes("youtu.be")) {
+    platform = "youtube";
+    // Extraer ID de YouTube
+    if (url.includes("youtu.be")) {
+      const match = url.match(/youtu\.be\/([^?]+)/);
+      if (match) songInfo.id = match[1];
+    } else {
+      const match = url.match(/[?&]v=([^&]+)/);
+      if (match) songInfo.id = match[1];
+    }
+  }
+
+  songInfo.platform = platform;
+  CalendarState.selectedSong = songInfo;
+
+  // Mostrar vista previa
+  songPreview.style.display = "block";
+  songPreview.innerHTML = `
+    <div class="memory-song">
+      <div class="memory-song-cover">🎵</div>
+      <div class="memory-song-info">
+        <div class="memory-song-title">Canción de ${platform.charAt(0).toUpperCase() + platform.slice(1)}</div>
+        <div class="memory-song-artist">ID: ${songInfo.id || 'N/A'}</div>
+      </div>
+      <button type="button" class="memory-song-play" onclick="window.open('${url}', '_blank')">▶</button>
+      <button type="button" class="memory-preview-remove" style="position:static;margin-left:8px;">×</button>
+    </div>
+  `;
+
+  songPreview.querySelector(".memory-preview-remove").addEventListener("click", () => {
+    CalendarState.selectedSong = null;
+    songPreview.style.display = "none";
+    songUrl.value = "";
+  });
 }
 
 // ============================================
@@ -474,21 +636,38 @@ async function saveEvent(event) {
     const [year, month, day] = date.split('-').map(Number);
     const eventDate = new Date(year, month - 1, day);
 
+    // Preparar datos multimedia
+    // NOTA: Las fotos se guardan temporalmente como base64 hasta que Firebase Storage esté configurado
+    // Esto es una solución temporal que permite la funcionalidad sin inventar APIs inexistentes
+    const fotosData = CalendarState.selectedPhotos.map(photo => photo.dataUrl);
+
+    const eventData = {
+      titulo: title,
+      descripcion: description,
+      fecha: eventDate,
+      color: color || '#8b6254',
+      creadoPor: AppState.currentUser.uid,
+      creadoEn: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    // Agregar fotos si existen
+    if (fotosData.length > 0) {
+      eventData.fotos = fotosData;
+    }
+
+    // Agregar canción si existe
+    if (CalendarState.selectedSong) {
+      eventData.cancion = CalendarState.selectedSong;
+    }
+
     await db.collection('couples')
       .doc(AppState.coupleId)
       .collection('calendario')
-      .add({
-        titulo: title,
-        descripcion: description,
-        fecha: eventDate,
-        color: color || '#8b6254',
-        creadoPor: AppState.currentUser.uid,
-        creadoEn: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      .add(eventData);
 
-    console.log('✓ Evento guardado');
+    console.log('✓ Recuerdo guardado');
     if (typeof showNotification === 'function') {
-      showNotification('Evento guardado correctamente', 'success');
+      showNotification('Recuerdo guardado correctamente', 'success');
     }
 
     closeEventModal();
@@ -501,9 +680,9 @@ async function saveEvent(event) {
     await loadCalendarEvents();
 
   } catch (error) {
-    console.error('✗ Error al guardar evento:', error);
+    console.error('✗ Error al guardar recuerdo:', error);
     if (typeof showNotification === 'function') {
-      showNotification('Error al guardar evento', 'error');
+      showNotification('Error al guardar recuerdo', 'error');
     }
   }
 }
@@ -523,7 +702,7 @@ async function deleteEvent(id) {
 
   const event = Object.values(CalendarState.events).flat().find(item => item.id === id);
   if (!event) {
-    console.error('✗ Evento no encontrado:', id);
+    console.error('✗ Recuerdo no encontrado:', id);
     return;
   }
 
@@ -538,19 +717,213 @@ async function deleteEvent(id) {
       .doc(id)
       .delete();
 
-    console.log('✓ Evento eliminado');
+    console.log('✓ Recuerdo eliminado');
     if (typeof showNotification === 'function') {
-      showNotification('Evento eliminado', 'success');
+      showNotification('Recuerdo eliminado', 'success');
     }
 
     await loadCalendarEvents();
 
   } catch (error) {
-    console.error('✗ Error al eliminar evento:', error);
+    console.error('✗ Error al eliminar recuerdo:', error);
     if (typeof showNotification === 'function') {
-      showNotification('Error al eliminar evento', 'error');
+      showNotification('Error al eliminar recuerdo', 'error');
     }
   }
+}
+
+// ============================================
+// COMPARTIR RECUERDOS
+// ============================================
+function showShareMenu(event, clickEvent) {
+  clickEvent.stopPropagation();
+
+  // Cerrar menús existentes
+  document.querySelectorAll('.share-menu').forEach(menu => menu.remove());
+
+  const shareMenu = document.createElement('div');
+  shareMenu.className = 'share-menu open';
+  shareMenu.innerHTML = `
+    <button class="share-option" data-platform="instagram">
+      <span>📷</span> Instagram
+    </button>
+    <button class="share-option" data-platform="tiktok">
+      <span>🎵</span> TikTok
+    </button>
+    <button class="share-option" data-platform="facebook">
+      <span>📘</span> Facebook
+    </button>
+    <button class="share-option" data-platform="whatsapp">
+      <span>💬</span> WhatsApp
+    </button>
+    <button class="share-option" data-platform="copy">
+      <span>📋</span> Copiar contenido
+    </button>
+    <button class="share-option" data-platform="web">
+      <span>🔗</span> Compartir enlace
+    </button>
+  `;
+
+  // Posicionar el menú cerca del botón
+  const rect = clickEvent.target.getBoundingClientRect();
+  shareMenu.style.position = 'fixed';
+  shareMenu.style.top = `${rect.bottom + 5}px`;
+  shareMenu.style.right = `${window.innerWidth - rect.right}px`;
+
+  document.body.appendChild(shareMenu);
+
+  // Manejar selección de plataforma
+  shareMenu.querySelectorAll('.share-option').forEach(option => {
+    option.addEventListener('click', () => {
+      const platform = option.dataset.platform;
+      handleShare(event, platform);
+      shareMenu.remove();
+    });
+  });
+
+  // Cerrar menú al hacer clic fuera
+  setTimeout(() => {
+    document.addEventListener('click', function closeMenu(e) {
+      if (!shareMenu.contains(e.target)) {
+        shareMenu.remove();
+        document.removeEventListener('click', closeMenu);
+      }
+    });
+  }, 0);
+}
+
+function handleShare(event, platform) {
+  const shareData = generateShareContent(event);
+
+  switch (platform) {
+    case 'instagram':
+      // Instagram no permite compartir directamente desde web sin API oficial
+      // Preparamos el contenido para que el usuario lo comparta manualmente
+      if (navigator.share) {
+        navigator.share({
+          title: shareData.title,
+          text: shareData.text,
+          url: shareData.url
+        }).catch(err => console.log('Error al compartir:', err));
+      } else {
+        alert('Para compartir en Instagram, copia el contenido y pégalo en la app de Instagram.');
+        copyToClipboard(shareData.text);
+      }
+      break;
+
+    case 'tiktok':
+      // TikTok no permite compartir directamente desde web sin API oficial
+      if (navigator.share) {
+        navigator.share({
+          title: shareData.title,
+          text: shareData.text,
+          url: shareData.url
+        }).catch(err => console.log('Error al compartir:', err));
+      } else {
+        alert('Para compartir en TikTok, copia el contenido y pégalo en la app de TikTok.');
+        copyToClipboard(shareData.text);
+      }
+      break;
+
+    case 'facebook':
+      const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareData.url)}&quote=${encodeURIComponent(shareData.text)}`;
+      window.open(fbUrl, '_blank', 'width=600,height=400');
+      break;
+
+    case 'whatsapp':
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(shareData.text + ' ' + shareData.url)}`;
+      window.open(waUrl, '_blank');
+      break;
+
+    case 'copy':
+      copyToClipboard(shareData.text + ' ' + shareData.url);
+      if (typeof showNotification === 'function') {
+        showNotification('Contenido copiado al portapapeles', 'success');
+      }
+      break;
+
+    case 'web':
+      if (navigator.share) {
+        navigator.share({
+          title: shareData.title,
+          text: shareData.text,
+          url: shareData.url
+        }).catch(err => console.log('Error al compartir:', err));
+      } else {
+        copyToClipboard(shareData.url);
+        if (typeof showNotification === 'function') {
+          showNotification('Enlace copiado al portapapeles', 'success');
+        }
+      }
+      break;
+  }
+}
+
+function generateShareContent(event) {
+  const dateStr = formatLongDate(dateKey(event.fecha));
+  let text = `💕 Recuerdo especial del ${dateStr}\n\n`;
+  text += `"${event.titulo}"\n`;
+
+  if (event.descripcion) {
+    text += `\n${event.descripcion}\n`;
+  }
+
+  if (event.cancion) {
+    text += `\n🎵 Canción: ${event.cancion.url}\n`;
+  }
+
+  text += `\n— Compartido desde LoveSpace`;
+
+  return {
+    title: event.titulo,
+    text: text,
+    url: window.location.href // URL actual de la app
+  };
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(err => {
+      console.error('Error al copiar:', err);
+      fallbackCopyToClipboard(text);
+    });
+  } else {
+    fallbackCopyToClipboard(text);
+  }
+}
+
+function fallbackCopyToClipboard(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.select();
+  try {
+    document.execCommand('copy');
+  } catch (err) {
+    console.error('Error al copiar:', err);
+  }
+  document.body.removeChild(textArea);
+}
+
+// ============================================
+// GENERAR TARJETA DE COMPARTIR (PREPARACIÓN)
+// ============================================
+function generateShareCard(memory) {
+  // Esta función está preparada para futura implementación
+  // Podría generar una imagen/canvas visual del recuerdo para compartir
+  // Por ahora devuelve los datos estructurados para uso futuro
+
+  return {
+    date: formatLongDate(dateKey(memory.fecha)),
+    title: memory.titulo,
+    description: memory.descripcion,
+    photos: memory.fotos || [],
+    song: memory.cancion || null,
+    color: memory.color,
+    brand: 'LoveSpace'
+  };
 }
 
 // ============================================
