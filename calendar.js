@@ -374,15 +374,28 @@ function renderSelectedDay() {
         <div class="day-event-title">${escapeHTML(event.titulo)}</div>
         ${event.descripcion ? `<div class="day-event-description">${escapeHTML(event.descripcion)}</div>` : ""}
         ${extraContent}
+        <div class="memory-actions">
+          <button class="share-button" data-platform="instagram" data-id="${escapeHTML(event.id)}">📷 Instagram</button>
+          <button class="share-button" data-platform="facebook" data-id="${escapeHTML(event.id)}">📘 Facebook</button>
+          <button class="share-button" data-platform="whatsapp" data-id="${escapeHTML(event.id)}">💬 WhatsApp</button>
+          <button class="share-button" data-platform="copy" data-id="${escapeHTML(event.id)}">📋 Copiar</button>
+        </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
         <button class="delete-event" data-id="${escapeHTML(event.id)}">Eliminar</button>
-        <button class="share-button" data-id="${escapeHTML(event.id)}">Compartir</button>
       </div>
     `;
 
     item.querySelector(".delete-event").addEventListener("click", () => deleteEvent(event.id));
-    item.querySelector(".share-button").addEventListener("click", (e) => showShareMenu(event, e));
+
+    // Agregar listeners a los botones de compartir
+    item.querySelectorAll(".share-button").forEach(button => {
+      button.addEventListener("click", (e) => {
+        const platform = button.dataset.platform;
+        handleShare(event, platform);
+      });
+    });
+
     selectedDayEvents.appendChild(item);
   });
 }
@@ -735,62 +748,6 @@ async function deleteEvent(id) {
 // ============================================
 // COMPARTIR RECUERDOS
 // ============================================
-function showShareMenu(event, clickEvent) {
-  clickEvent.stopPropagation();
-
-  // Cerrar menús existentes
-  document.querySelectorAll('.share-menu').forEach(menu => menu.remove());
-
-  const shareMenu = document.createElement('div');
-  shareMenu.className = 'share-menu open';
-  shareMenu.innerHTML = `
-    <button class="share-option" data-platform="instagram">
-      <span>📷</span> Instagram
-    </button>
-    <button class="share-option" data-platform="tiktok">
-      <span>🎵</span> TikTok
-    </button>
-    <button class="share-option" data-platform="facebook">
-      <span>📘</span> Facebook
-    </button>
-    <button class="share-option" data-platform="whatsapp">
-      <span>💬</span> WhatsApp
-    </button>
-    <button class="share-option" data-platform="copy">
-      <span>📋</span> Copiar contenido
-    </button>
-    <button class="share-option" data-platform="web">
-      <span>🔗</span> Compartir enlace
-    </button>
-  `;
-
-  // Posicionar el menú cerca del botón
-  const rect = clickEvent.target.getBoundingClientRect();
-  shareMenu.style.position = 'fixed';
-  shareMenu.style.top = `${rect.bottom + 5}px`;
-  shareMenu.style.right = `${window.innerWidth - rect.right}px`;
-
-  document.body.appendChild(shareMenu);
-
-  // Manejar selección de plataforma
-  shareMenu.querySelectorAll('.share-option').forEach(option => {
-    option.addEventListener('click', () => {
-      const platform = option.dataset.platform;
-      handleShare(event, platform);
-      shareMenu.remove();
-    });
-  });
-
-  // Cerrar menú al hacer clic fuera
-  setTimeout(() => {
-    document.addEventListener('click', function closeMenu(e) {
-      if (!shareMenu.contains(e.target)) {
-        shareMenu.remove();
-        document.removeEventListener('click', closeMenu);
-      }
-    });
-  }, 0);
-}
 
 function handleShare(event, platform) {
   const shareData = generateShareContent(event);
@@ -798,7 +755,6 @@ function handleShare(event, platform) {
   switch (platform) {
     case 'instagram':
       // Instagram no permite compartir directamente desde web sin API oficial
-      // Preparamos el contenido para que el usuario lo comparta manualmente
       if (navigator.share) {
         navigator.share({
           title: shareData.title,
@@ -806,22 +762,10 @@ function handleShare(event, platform) {
           url: shareData.url
         }).catch(err => console.log('Error al compartir:', err));
       } else {
-        alert('Para compartir en Instagram, copia el contenido y pégalo en la app de Instagram.');
         copyToClipboard(shareData.text);
-      }
-      break;
-
-    case 'tiktok':
-      // TikTok no permite compartir directamente desde web sin API oficial
-      if (navigator.share) {
-        navigator.share({
-          title: shareData.title,
-          text: shareData.text,
-          url: shareData.url
-        }).catch(err => console.log('Error al compartir:', err));
-      } else {
-        alert('Para compartir en TikTok, copia el contenido y pégalo en la app de TikTok.');
-        copyToClipboard(shareData.text);
+        if (typeof showNotification === 'function') {
+          showNotification('Contenido copiado para Instagram', 'success');
+        }
       }
       break;
 
@@ -839,21 +783,6 @@ function handleShare(event, platform) {
       copyToClipboard(shareData.text + ' ' + shareData.url);
       if (typeof showNotification === 'function') {
         showNotification('Contenido copiado al portapapeles', 'success');
-      }
-      break;
-
-    case 'web':
-      if (navigator.share) {
-        navigator.share({
-          title: shareData.title,
-          text: shareData.text,
-          url: shareData.url
-        }).catch(err => console.log('Error al compartir:', err));
-      } else {
-        copyToClipboard(shareData.url);
-        if (typeof showNotification === 'function') {
-          showNotification('Enlace copiado al portapapeles', 'success');
-        }
       }
       break;
   }
