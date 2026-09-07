@@ -1,5 +1,5 @@
 // ============================================
-// CALENDARIO LOVESPACE - SISTEMA COMPLETO
+// CALENDARIO TWO-COFFE - SISTEMA COMPLETO
 // ============================================
 
 const CalendarState = {
@@ -8,6 +8,58 @@ const CalendarState = {
   events: {},
   isInitialized: false
 };
+
+// ============================================
+// ELEMENTOS
+// ============================================
+const monthTitle = document.getElementById("monthTitle");
+const calendarGrid = document.getElementById("calendarGrid");
+const selectedDayTitle = document.getElementById("selectedDayTitle");
+const selectedDayEvents = document.getElementById("selectedDayEvents");
+const eventModal = document.getElementById("eventModal");
+const eventForm = document.getElementById("eventForm");
+const eventTitle = document.getElementById("eventTitle");
+const eventDate = document.getElementById("eventDate");
+const eventDescription = document.getElementById("eventDescription");
+const eventColor = document.getElementById("eventColor");
+
+// ============================================
+// UTILIDADES DE FECHA
+// ============================================
+function pad(number) {
+  return String(number).padStart(2, "0");
+}
+
+function dateKey(date) {
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate())
+  ].join("-");
+}
+
+function parseDateKey(key) {
+  const [year, month, day] = key.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function formatLongDate(key) {
+  return parseDateKey(key).toLocaleDateString("es-MX", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function escapeHTML(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
 // ============================================
 // INICIALIZACIÓN
@@ -23,7 +75,7 @@ function initializeCalendar() {
   
   // Esperar a que el DOM esté listo
   setTimeout(() => {
-    renderCalendarGrid();
+    renderCalendar();
     
     // Cargar eventos del mes actual
     loadCalendarEvents();
@@ -39,101 +91,66 @@ function initializeCalendar() {
 function setupCalendarListeners() {
   console.log('📅 Configurando listeners del calendario...');
 
-  const prevMonthBtn = document.getElementById('previousMonth');
-  const nextMonthBtn = document.getElementById('nextMonth');
-  const addEventBtn = document.getElementById('addEventButton');
-  const todayBtn = document.getElementById('todayButton');
-  const addSelectedDayEventBtn = document.getElementById('addSelectedDayEvent');
-  const eventForm = document.getElementById('eventForm');
+  // Navegación de meses
+  document.getElementById("previousMonth").addEventListener("click", () => {
+    CalendarState.currentDate = new Date(
+      CalendarState.currentDate.getFullYear(),
+      CalendarState.currentDate.getMonth() - 1,
+      1
+    );
+    renderCalendar();
+    loadCalendarEvents();
+  });
 
-  console.log(`  - prevMonthBtn: ${prevMonthBtn ? '✓' : '✗'}`);
-  console.log(`  - nextMonthBtn: ${nextMonthBtn ? '✓' : '✗'}`);
-  console.log(`  - addEventBtn: ${addEventBtn ? '✓' : '✗'}`);
-  console.log(`  - todayBtn: ${todayBtn ? '✓' : '✗'}`);
-  console.log(`  - addSelectedDayEventBtn: ${addSelectedDayEventBtn ? '✓' : '✗'}`);
-  console.log(`  - eventForm: ${eventForm ? '✓' : '✗'}`);
+  document.getElementById("nextMonth").addEventListener("click", () => {
+    CalendarState.currentDate = new Date(
+      CalendarState.currentDate.getFullYear(),
+      CalendarState.currentDate.getMonth() + 1,
+      1
+    );
+    renderCalendar();
+    loadCalendarEvents();
+  });
 
-  if (prevMonthBtn) {
-    prevMonthBtn.addEventListener('click', () => {
-      console.log('📅 Botón mes anterior clickeado');
-      CalendarState.currentDate.setMonth(CalendarState.currentDate.getMonth() - 1);
-      renderCalendarGrid();
-      loadCalendarEvents();
-    });
-  } else {
-    console.error('✗ previousMonth no encontrado');
-  }
+  // Botón hoy
+  document.getElementById("todayButton").addEventListener("click", () => {
+    const today = new Date();
+    CalendarState.currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    CalendarState.selectedDate = dateKey(today);
+    renderCalendar();
+    renderSelectedDay();
+    loadCalendarEvents();
+  });
 
-  if (nextMonthBtn) {
-    nextMonthBtn.addEventListener('click', () => {
-      console.log('📅 Botón mes siguiente clickeado');
-      CalendarState.currentDate.setMonth(CalendarState.currentDate.getMonth() + 1);
-      renderCalendarGrid();
-      loadCalendarEvents();
-    });
-  } else {
-    console.error('✗ nextMonth no encontrado');
-  }
+  // Botones agregar
+  document.getElementById("addEventButton").addEventListener("click", () => openEventModal());
+  document.getElementById("addSelectedDayEvent").addEventListener("click", () => {
+    if (CalendarState.selectedDate) {
+      openEventModal(CalendarState.selectedDate);
+    } else {
+      openEventModal();
+    }
+  });
 
-  if (todayBtn) {
-    todayBtn.addEventListener('click', () => {
-      console.log('📅 Botón hoy clickeado');
-      CalendarState.currentDate = new Date();
-      CalendarState.selectedDate = dateKey(new Date());
-      renderCalendarGrid();
-      renderSelectedDay();
-      loadCalendarEvents();
-    });
-  } else {
-    console.error('✗ todayButton no encontrado');
-  }
+  // Formulario
+  eventForm.addEventListener("submit", saveEvent);
 
-  if (addEventBtn) {
-    addEventBtn.addEventListener('click', () => {
-      console.log('📅 Botón añadir evento clickeado');
-      calendarOpenEventModal();
-    });
-  } else {
-    console.error('✗ addEventButton no encontrado');
-  }
-
-  if (addSelectedDayEventBtn) {
-    addSelectedDayEventBtn.addEventListener('click', () => {
-      console.log('📅 Botón añadir evento día seleccionado clickeado');
-      if (CalendarState.selectedDate) {
-        calendarOpenEventModal(CalendarState.selectedDate);
-      } else {
-        calendarOpenEventModal();
-      }
-    });
-  } else {
-    console.error('✗ addSelectedDayEvent no encontrado');
-  }
-
-  if (eventForm) {
-    eventForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      calendarSaveEvent();
-    });
-  }
-
-  // Cerrar modal
-  const closeModal = document.getElementById('closeModal');
-  if (closeModal) {
-    closeModal.addEventListener('click', calendarCloseEventModal);
-  }
-
-  const cancelModal = document.getElementById('cancelModal');
-  if (cancelModal) {
-    cancelModal.addEventListener('click', calendarCloseEventModal);
-  }
+  // Modal
+  document.getElementById("closeModal").addEventListener("click", closeEventModal);
+  document.getElementById("cancelModal").addEventListener("click", closeEventModal);
+  eventModal.addEventListener("click", (event) => {
+    if (event.target === eventModal) closeEventModal();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && eventModal.classList.contains("open")) closeEventModal();
+  });
 
   // Selección de color
-  document.querySelectorAll('.color-option').forEach(option => {
-    option.addEventListener('click', () => {
-      document.querySelectorAll('.color-option').forEach(item => item.classList.remove('selected'));
-      option.classList.add('selected');
-      document.getElementById('eventColor').value = option.dataset.color;
+  document.querySelectorAll(".color-option").forEach(option => {
+    option.addEventListener("click", () => {
+      document.querySelectorAll(".color-option").forEach(item => item.classList.remove("selected"));
+      option.classList.add("selected");
+      eventColor.value = option.dataset.color;
     });
   });
 
@@ -143,198 +160,149 @@ function setupCalendarListeners() {
 // ============================================
 // RENDERIZADO DEL CALENDARIO
 // ============================================
-function renderCalendarGrid() {
-  console.log('📅 Renderizando calendario...');
-  
+function renderCalendar() {
   const year = CalendarState.currentDate.getFullYear();
   const month = CalendarState.currentDate.getMonth();
-  
-  console.log(`  - Año: ${year}, Mes: ${month}`);
-  
-  // Actualizar título del mes
-  const monthTitle = document.getElementById('monthTitle');
-  if (monthTitle) {
-    monthTitle.textContent = new Date(year, month, 1).toLocaleDateString('es-MX', {
-      month: 'long',
-      year: 'numeric'
-    });
-    console.log(`  - Título actualizado`);
-  } else {
-    console.error(' monthTitle no encontrado');
-  }
-  
-  // Calcular días del mes
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const startingDay = firstDay.getDay();
-  const totalDays = lastDay.getDate();
 
-  console.log(`  - Primer día del mes: ${firstDay.toDateString()} (día de semana: ${startingDay})`);
-  console.log(`  - Día inicial: ${startingDay}, Total días: ${totalDays}`);
-  
-  // Convertir para que lunes sea el primer día
-  const mondayIndex = startingDay === 0 ? 6 : startingDay - 1;
-  
-  // Renderizar grid
-  const calendarGrid = document.getElementById('calendarGrid');
-  if (!calendarGrid) {
-    console.error(' calendarGrid no encontrado');
-    return;
-  }
-  
-  console.log('  - Limpiando grid...');
-  calendarGrid.innerHTML = '';
-  
-  // Días del mes anterior
+  monthTitle.textContent = new Date(year, month, 1).toLocaleDateString("es-MX", {
+    month: "long",
+    year: "numeric"
+  });
+
+  calendarGrid.innerHTML = "";
+
+  // JS devuelve domingo = 0. Convertimos para que lunes sea el primer día.
+  const firstDay = new Date(year, month, 1).getDay();
+  const mondayIndex = firstDay === 0 ? 6 : firstDay - 1;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPreviousMonth = new Date(year, month, 0).getDate();
-  for (let i = 0; i < mondayIndex; i++) {
-    const dayNumber = daysInPreviousMonth - mondayIndex + i + 1;
-    const cell = document.createElement('div');
-    cell.className = 'calendar-day other-month';
-    cell.innerHTML = `<div class="day-number">${dayNumber}</div>`;
-    calendarGrid.appendChild(cell);
-  }
-  
-  // Días del mes
-  const today = new Date();
-  console.log(`  - Agregando ${totalDays} días del mes`);
-  for (let day = 1; day <= totalDays; day++) {
-    const cell = document.createElement('div');
-    cell.className = 'calendar-day';
-    
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    
-    // Marcar hoy
-    const isToday = today.getDate() === day &&
-                   today.getMonth() === month &&
-                   today.getFullYear() === year;
-    
-    if (isToday) {
-      cell.classList.add('today');
+
+  // 42 celdas garantizan una cuadrícula completa de 6 semanas.
+  for (let i = 0; i < 42; i++) {
+    let dayNumber;
+    let cellDate;
+    let isOtherMonth = false;
+
+    if (i < mondayIndex) {
+      dayNumber = daysInPreviousMonth - mondayIndex + i + 1;
+      cellDate = new Date(year, month - 1, dayNumber);
+      isOtherMonth = true;
+    } else if (i >= mondayIndex + daysInMonth) {
+      dayNumber = i - mondayIndex - daysInMonth + 1;
+      cellDate = new Date(year, month + 1, dayNumber);
+      isOtherMonth = true;
+    } else {
+      dayNumber = i - mondayIndex + 1;
+      cellDate = new Date(year, month, dayNumber);
     }
-    
-    // Marcar seleccionado
-    if (CalendarState.selectedDate === dateStr) {
-      cell.style.background = 'var(--surface-soft)';
+
+    const key = dateKey(cellDate);
+    const cell = document.createElement("div");
+    cell.className = "calendar-day";
+
+    if (isOtherMonth) {
+      cell.classList.add("other-month");
     }
-    
-    // Número del día
-    const dayNumber = document.createElement('div');
-    dayNumber.className = 'day-number';
-    dayNumber.textContent = day;
-    cell.appendChild(dayNumber);
-    
-    // Eventos del día
-    const dayEvents = CalendarState.events[dateStr] || [];
-    if (dayEvents.length > 0) {
-      const eventsContainer = document.createElement('div');
-      eventsContainer.className = 'day-events';
-      
-      dayEvents.slice(0, 4).forEach(event => {
-        const eventButton = document.createElement('button');
-        eventButton.className = 'calendar-event';
-        eventButton.style.borderLeftColor = event.color;
-        eventButton.textContent = event.titulo;
-        eventButton.title = event.titulo;
-        eventButton.addEventListener('click', (e) => {
-          e.stopPropagation();
-          calendarSelectDate(dateStr);
-        });
-        eventsContainer.appendChild(eventButton);
+
+    if (key === dateKey(new Date())) {
+      cell.classList.add("today");
+    }
+
+    if (CalendarState.selectedDate === key) {
+      cell.style.background = "var(--surface-soft)";
+    }
+
+    const number = document.createElement("div");
+    number.className = "day-number";
+    number.textContent = dayNumber;
+    cell.appendChild(number);
+
+    const eventsContainer = document.createElement("div");
+    eventsContainer.className = "day-events";
+
+    const dayEvents = CalendarState.events[key] || [];
+
+    dayEvents.slice(0, 4).forEach(event => {
+      const eventButton = document.createElement("button");
+      eventButton.className = "calendar-event";
+      eventButton.style.borderLeftColor = event.color;
+      eventButton.textContent = event.titulo;
+      eventButton.title = event.titulo;
+      eventButton.addEventListener("click", (eventClick) => {
+        eventClick.stopPropagation();
+        selectDate(key);
       });
-      
-      if (dayEvents.length > 4) {
-        const more = document.createElement('div');
-        more.style.fontSize = '10px';
-        more.style.color = 'var(--muted)';
-        more.textContent = `+${dayEvents.length - 4} más`;
-        eventsContainer.appendChild(more);
-      }
-      
-      cell.appendChild(eventsContainer);
-    }
-    
-    // Click en el día
-    cell.addEventListener('click', () => {
-      calendarSelectDate(dateStr);
+      eventsContainer.appendChild(eventButton);
     });
-    
+
+    if (dayEvents.length > 4) {
+      const more = document.createElement("div");
+      more.style.fontSize = "10px";
+      more.style.color = "var(--muted)";
+      more.textContent = `+${dayEvents.length - 4} más`;
+      eventsContainer.appendChild(more);
+    }
+
+    cell.appendChild(eventsContainer);
+
+    cell.addEventListener("click", () => selectDate(key));
+
     calendarGrid.appendChild(cell);
   }
-  
-  // Días del mes siguiente para completar 42 celdas (6 semanas)
-  const totalCells = mondayIndex + totalDays;
-  const remainingCells = 42 - totalCells;
-  for (let i = 1; i <= remainingCells; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'calendar-day other-month';
-    cell.innerHTML = `<div class="day-number">${i}</div>`;
-    calendarGrid.appendChild(cell);
-  }
-  
-  console.log(' Calendario renderizado');
 }
 
 // ============================================
-// UTILIDADES DE FECHA
+// SELECCIONAR DÍA
 // ============================================
-function dateKey(date) {
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, '0'),
-    String(date.getDate()).padStart(2, '0')
-  ].join('-');
-}
+function selectDate(key) {
+  CalendarState.selectedDate = key;
+  const selected = parseDateKey(key);
 
-// ============================================
-// SELECCIÓN DE FECHA
-// ============================================
-function calendarSelectDate(dateStr) {
-  CalendarState.selectedDate = dateStr;
-  renderCalendarGrid();
+  // Si el usuario selecciona un día de otro mes, el calendario cambia automáticamente.
+  if (selected.getMonth() !== CalendarState.currentDate.getMonth() ||
+      selected.getFullYear() !== CalendarState.currentDate.getFullYear()) {
+    CalendarState.currentDate = new Date(selected.getFullYear(), selected.getMonth(), 1);
+  }
+
+  renderCalendar();
   renderSelectedDay();
 }
 
 // ============================================
-// RENDERIZAR DÍA SELECCIONADO
+// RECUERDOS DEL DÍA
 // ============================================
 function renderSelectedDay() {
-  const selectedDayTitle = document.getElementById('selectedDayTitle');
-  const selectedDayEvents = document.getElementById('selectedDayEvents');
-  
-  if (!selectedDayTitle || !selectedDayEvents) return;
-  
   if (!CalendarState.selectedDate) {
-    selectedDayTitle.textContent = 'Selecciona un día';
-    selectedDayEvents.innerHTML = '<div class="empty">Selecciona un día para ver sus recuerdos.</div>';
+    selectedDayTitle.textContent = "Selecciona un día";
+    selectedDayEvents.innerHTML = `<div class="empty">Selecciona un día para ver sus recuerdos.</div>`;
     return;
   }
-  
-  const date = new Date(CalendarState.selectedDate);
-  selectedDayTitle.textContent = date.toLocaleDateString('es-MX', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
-  
+
+  selectedDayTitle.textContent = formatLongDate(CalendarState.selectedDate);
+
   const events = CalendarState.events[CalendarState.selectedDate] || [];
-  
-  if (events.length === 0) {
-    selectedDayEvents.innerHTML = '<div class="empty">No hay recuerdos para este día.</div>';
+
+  if (!events.length) {
+    selectedDayEvents.innerHTML = `<div class="empty">No hay recuerdos para este día.</div>`;
     return;
   }
-  
-  selectedDayEvents.innerHTML = events.map(event => `
-    <div class="day-event-item">
-      <div class="event-color" style="background:${event.color}"></div>
+
+  selectedDayEvents.innerHTML = "";
+
+  events.forEach(event => {
+    const item = document.createElement("div");
+    item.className = "day-event-item";
+    item.innerHTML = `
+      <div class="event-color" style="background:${escapeHTML(event.color)}"></div>
       <div class="day-event-content">
-        <div class="day-event-title">${event.titulo}</div>
-        ${event.descripcion ? `<div class="day-event-description">${event.descripcion}</div>` : ''}
+        <div class="day-event-title">${escapeHTML(event.titulo)}</div>
+        ${event.descripcion ? `<div class="day-event-description">${escapeHTML(event.descripcion)}</div>` : ""}
       </div>
-      <button class="delete-event" onclick="calendarDeleteEvent('${event.id}', '${CalendarState.selectedDate}')">Eliminar</button>
-    </div>
-  `).join('');
+      <button class="delete-event" data-id="${escapeHTML(event.id)}">Eliminar</button>
+    `;
+    item.querySelector(".delete-event").addEventListener("click", () => deleteEvent(event.id));
+    selectedDayEvents.appendChild(item);
+  });
 }
 
 // ============================================
@@ -345,33 +313,33 @@ async function loadCalendarEvents() {
     console.log('⚠ No hay coupleId, no se pueden cargar eventos');
     return;
   }
-  
+
   const year = CalendarState.currentDate.getFullYear();
   const month = CalendarState.currentDate.getMonth();
-  
+
   try {
     const db = getDB();
     const startDate = new Date(year, month, 1);
     const endDate = new Date(year, month + 1, 0);
-    
+
     const eventsSnapshot = await db.collection('couples')
       .doc(AppState.coupleId)
       .collection('calendario')
       .where('fecha', '>=', startDate)
       .where('fecha', '<=', endDate)
       .get();
-    
+
     CalendarState.events = {};
-    
+
     eventsSnapshot.forEach(doc => {
       const data = doc.data();
       const date = data.fecha.toDate();
       const dateStr = dateKey(date);
-      
+
       if (!CalendarState.events[dateStr]) {
         CalendarState.events[dateStr] = [];
       }
-      
+
       CalendarState.events[dateStr].push({
         id: doc.id,
         titulo: data.titulo,
@@ -380,13 +348,13 @@ async function loadCalendarEvents() {
         fecha: date
       });
     });
-    
+
     console.log(`✓ ${eventsSnapshot.size} eventos cargados para ${year}-${month + 1}`);
-    renderCalendarGrid();
+    renderCalendar();
     if (CalendarState.selectedDate) {
       renderSelectedDay();
     }
-    
+
   } catch (error) {
     console.error('✗ Error al cargar eventos:', error);
     showNotification('Error al cargar eventos del calendario', 'error');
@@ -396,95 +364,70 @@ async function loadCalendarEvents() {
 // ============================================
 // MODAL PARA AGREGAR RECUERDO
 // ============================================
-function calendarOpenEventModal(dateStr = null) {
-  const modal = document.getElementById('eventModal');
-  const form = document.getElementById('eventForm');
-  const dateInput = document.getElementById('eventDate');
-  const colorInput = document.getElementById('eventColor');
-  
-  if (!modal || !form || !dateInput) return;
-  
-  // Resetear formulario
-  form.reset();
-  
-  // Resetear color
-  if (colorInput) colorInput.value = '#8b6254';
-  document.querySelectorAll('.color-option').forEach(option => option.classList.remove('selected'));
-  const defaultColor = document.querySelector('.color-option[data-color="#8b6254"]');
-  if (defaultColor) defaultColor.classList.add('selected');
-  
-  // Establecer fecha
-  if (dateStr) {
-    dateInput.value = dateStr;
+function openEventModal(date = null) {
+  eventForm.reset();
+  eventColor.value = "#8b6254";
+  document.querySelectorAll(".color-option").forEach(option => option.classList.remove("selected"));
+  document.querySelector('.color-option[data-color="#8b6254"]').classList.add("selected");
+
+  if (date) {
+    eventDate.value = date;
   } else if (CalendarState.selectedDate) {
-    dateInput.value = CalendarState.selectedDate;
+    eventDate.value = CalendarState.selectedDate;
   } else {
-    dateInput.value = dateKey(new Date());
+    eventDate.value = dateKey(new Date());
   }
-  
-  modal.classList.add('open');
+
+  eventModal.classList.add("open");
+  setTimeout(() => eventTitle.focus(), 50);
 }
 
-function calendarCloseEventModal() {
-  const modal = document.getElementById('eventModal');
-  if (modal) {
-    modal.classList.remove('open');
-  }
+function closeEventModal() {
+  eventModal.classList.remove("open");
 }
 
 // ============================================
 // GUARDAR EVENTO
 // ============================================
-async function calendarSaveEvent() {
-  const form = document.getElementById('eventForm');
-  const titulo = document.getElementById('eventTitle').value;
-  const descripcion = document.getElementById('eventDescription').value;
-  const fecha = document.getElementById('eventDate').value;
-  const color = document.getElementById('eventColor').value;
-  
-  if (!titulo || !fecha) {
-    showNotification('Por favor completa el título y la fecha', 'error');
+async function saveEvent(event) {
+  event.preventDefault();
+
+  const title = eventTitle.value.trim();
+  const date = eventDate.value;
+  const description = eventDescription.value.trim();
+  const color = eventColor.value;
+
+  if (!title || !date) {
     return;
   }
-  
+
   try {
     const db = getDB();
-    const eventDate = new Date(fecha + 'T00:00:00');
-    
+    const eventDate = new Date(date + 'T00:00:00');
+
     await db.collection('couples')
       .doc(AppState.coupleId)
       .collection('calendario')
       .add({
-        titulo,
-        descripcion,
+        titulo: title,
+        descripcion: description,
         fecha: eventDate,
-        color,
+        color: color,
         creadoPor: AppState.currentUser.uid,
         creadoEn: firebase.firestore.FieldValue.serverTimestamp()
       });
-    
+
     console.log('✓ Evento guardado');
     showNotification('Evento guardado correctamente', 'success');
-    
-    calendarCloseEventModal();
-    
-    // Recargar eventos
-    const eventMonth = eventDate.getMonth();
-    const eventYear = eventDate.getFullYear();
 
-    if (eventMonth === CalendarState.currentDate.getMonth() &&
-        eventYear === CalendarState.currentDate.getFullYear()) {
-      await loadCalendarEvents();
-    } else {
-      CalendarState.currentDate = eventDate;
-      renderCalendarGrid();
-      await loadCalendarEvents();
-    }
-    
-    // Actualizar día seleccionado
-    CalendarState.selectedDate = fecha;
-    renderSelectedDay();
-    
+    closeEventModal();
+
+    CalendarState.selectedDate = date;
+    const selected = parseDateKey(date);
+    CalendarState.currentDate = new Date(selected.getFullYear(), selected.getMonth(), 1);
+
+    await loadCalendarEvents();
+
   } catch (error) {
     console.error('✗ Error al guardar evento:', error);
     showNotification('Error al guardar evento', 'error');
@@ -494,28 +437,26 @@ async function calendarSaveEvent() {
 // ============================================
 // ELIMINAR EVENTO
 // ============================================
-async function calendarDeleteEvent(eventId, dateStr) {
-  if (!confirm('¿Estás seguro de eliminar este evento?')) return;
-  
+async function deleteEvent(id) {
+  const event = Object.values(CalendarState.events).flat().find(item => item.id === id);
+  if (!event) return;
+
+  const confirmed = window.confirm(`¿Eliminar "${event.titulo}"?`);
+  if (!confirmed) return;
+
   try {
     const db = getDB();
     await db.collection('couples')
       .doc(AppState.coupleId)
       .collection('calendario')
-      .doc(eventId)
+      .doc(id)
       .delete();
-    
+
     console.log('✓ Evento eliminado');
     showNotification('Evento eliminado', 'success');
-    
-    // Recargar eventos
+
     await loadCalendarEvents();
-    
-    // Actualizar vista del día
-    if (CalendarState.selectedDate === fecha) {
-      calendarShowDayEvents(fecha);
-    }
-    
+
   } catch (error) {
     console.error('✗ Error al eliminar evento:', error);
     showNotification('Error al eliminar evento', 'error');
