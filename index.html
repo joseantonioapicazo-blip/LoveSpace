@@ -440,7 +440,7 @@
             </button>
 
             <button class="add-event-button" id="addEventButton">
-                + Agregar
+                + Agregar recuerdo
             </button>
 
         </div>
@@ -470,7 +470,7 @@
                 class="add-event-button"
                 id="addSelectedDayEvent"
             >
-                + Agregar
+                + Agregar recuerdo
             </button>
         </div>
 
@@ -1102,6 +1102,43 @@
             <div class="form-group">
 
                 <label>
+                    Fotos
+                </label>
+
+                <div class="photo-upload-area" id="photoUploadArea">
+                    <div class="photo-upload-icon">📷</div>
+                    <div class="photo-upload-text">Click para agregar fotos</div>
+                    <input type="file" id="photoInput" accept="image/*" multiple hidden>
+                </div>
+
+                <div class="memory-preview-gallery" id="photoPreviewGallery"></div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Canción
+                </label>
+
+                <div class="song-input-area">
+                    <input
+                        type="text"
+                        id="songUrl"
+                        placeholder="URL de la canción (Spotify, YouTube, etc.)"
+                    >
+                    <button type="button" class="song-add-button" id="addSongButton">
+                        Agregar
+                    </button>
+                </div>
+
+                <div id="songPreview" style="display: none;"></div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
                     Color
                 </label>
 
@@ -1173,7 +1210,7 @@
                     type="submit"
                     class="save-button"
                 >
-                    Guardar
+                    Guardar recuerdo
                 </button>
 
             </div>
