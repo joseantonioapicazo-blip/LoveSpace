@@ -589,30 +589,7 @@ function showLocationError(message) {
   }
 }
 
-// Función auxiliar para formatear fecha (debe existir en app.js o firebase.js)
-function formatFirestoreDateTime(timestamp) {
-  if (!timestamp) return '--';
-  
-  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-  const now = new Date();
-  const diff = now - date;
-  
-  if (diff < 60000) {
-    return 'Ahora mismo';
-  } else if (diff < 3600000) {
-    return `Hace ${Math.floor(diff / 60000)} minutos`;
-  } else if (diff < 86400000) {
-    return `Hace ${Math.floor(diff / 3600000)} horas`;
-  } else {
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
-}
+// La función formatFirestoreDateTime ya existe en firebase.js, usar esa implementación
 
 // ============================================
 // EXPORTAR FUNCIONES PARA app.js
