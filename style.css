@@ -773,61 +773,28 @@ button {
 
 .memory-actions {
     display: flex;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
     margin-top: 10px;
 }
 
 .share-button {
-    flex: 1;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border: 1px solid var(--border);
     background: var(--surface);
-    border-radius: 8px;
-    font-size: 11px;
+    border-radius: 6px;
+    font-size: 10px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
+    transition: all 0.2s;
 }
 
 .share-button:hover {
     background: var(--surface-soft);
-}
-
-.share-menu {
-    position: absolute;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    padding: 8px;
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-    z-index: 100;
-    min-width: 160px;
-}
-
-.share-menu.open {
-    display: flex;
-}
-
-.share-option {
-    padding: 10px 12px;
-    border: none;
-    background: transparent;
-    border-radius: 8px;
-    cursor: pointer;
-    text-align: left;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.share-option:hover {
-    background: var(--surface-soft);
+    border-color: var(--primary);
 }
 
 .photo-upload-area {
@@ -922,7 +889,7 @@ button {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    z-index: 100;
+    z-index: 1000;
 }
 
 .modal.open {
